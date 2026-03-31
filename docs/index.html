@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Differ — Lightweight Git Diff Viewer</title>
+    <meta
+      name="description"
+      content="A lightweight, native-feeling Git diff viewer built with Electron, React 19, and Tailwind CSS 4."
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #fafafa;
+        --surface: #ffffff;
+        --text: #1a1a2e;
+        --text-muted: #555;
+        --accent: #3b82f6;
+        --accent-hover: #2563eb;
+        --border: #e5e7eb;
+        --code-bg: #f3f4f6;
+        --badge-bg: #e0e7ff;
+        --badge-text: #3730a3;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f0f1a;
+          --surface: #1a1a2e;
+          --text: #e4e4e7;
+          --text-muted: #a1a1aa;
+          --accent: #60a5fa;
+          --accent-hover: #93bbfd;
+          --border: #27273a;
+          --code-bg: #1e1e30;
+          --badge-bg: #1e1b4b;
+          --badge-text: #a5b4fc;
+        }
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        color: var(--accent-hover);
+        text-decoration: underline;
+      }
+
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      header {
+        padding: 4rem 0 2rem;
+        text-align: center;
+      }
+      .hero img {
+        border-radius: 20px;
+        margin-bottom: 1rem;
+      }
+      .hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .tagline {
+        font-size: 1.15rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+        max-width: 600px;
+        margin-inline: auto;
+      }
+      .tagline-sub {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+      }
+      .badges {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        margin-top: 1.25rem;
+        flex-wrap: wrap;
+      }
+
+      main {
+        padding-bottom: 4rem;
+      }
+      section {
+        margin-top: 3rem;
+      }
+      section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+        gap: 1rem;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.25rem;
+      }
+      .card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+      }
+      .card p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      code,
+      kbd {
+        font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        font-size: 0.85em;
+        background: var(--code-bg);
+        padding: 0.15em 0.4em;
+        border-radius: 4px;
+      }
+
+      .tech-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .badge {
+        background: var(--badge-bg);
+        color: var(--badge-text);
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 0.3em 0.75em;
+        border-radius: 999px;
+      }
+
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .step {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+      .step-num {
+        flex-shrink: 0;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.9rem;
+        border-radius: 50%;
+      }
+      .step h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+      .step p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        overflow-x: auto;
+        margin-top: 0.5rem;
+      }
+      pre code {
+        background: none;
+        padding: 0;
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 2rem 0;
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container hero">
+        <img src="logo.png" alt="Differ logo" width="96" height="96" />
+        <h1>Differ</h1>
+        <p class="tagline">
+          A lightweight, native-feeling Git diff viewer built with Electron,
+          React 19, and Tailwind CSS 4.
+        </p>
+        <p class="tagline-sub">
+          Open any local repository, browse changed files, and review diffs
+          side-by-side — with inline commenting.
+        </p>
+        <div class="badges">
+          <img
+            src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-blue"
+            alt="Platforms"
+          />
+          <img
+            src="https://img.shields.io/badge/electron-33-47848f"
+            alt="Electron"
+          />
+          <img src="https://img.shields.io/badge/react-19-61dafb" alt="React" />
+          <img
+            src="https://img.shields.io/badge/license-MIT-green"
+            alt="License"
+          />
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section>
+        <h2>Features</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>Side-by-side diff</h3>
+            <p>
+              Aligned left/right columns with synchronized scrolling, just like
+              GitHub.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Live file watching</h3>
+            <p>
+              Diffs refresh automatically when you save files, switch branches,
+              commit, or stash.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Inline comments</h3>
+            <p>
+              Click any line to add review comments. Threads are marked outdated
+              when code changes.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Copy comments</h3>
+            <p>One-click export of all active comments to clipboard.</p>
+          </div>
+          <div class="card">
+            <h3>OS-adaptive theme</h3>
+            <p>
+              Light and dark modes via <code>prefers-color-scheme</code>, using
+              OKLCH colors.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Keyboard navigation</h3>
+            <p>
+              Arrow keys, <kbd>⌘/Ctrl+Enter</kbd> to submit,
+              <kbd>Escape</kbd> to close.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Tech Stack</h2>
+        <div class="tech-list">
+          <span class="badge">Electron 33</span>
+          <span class="badge">React 19</span>
+          <span class="badge">Tailwind CSS 4</span>
+          <span class="badge">Vite 6</span>
+          <span class="badge">electron-vite 5</span>
+          <span class="badge">simple-git</span>
+          <span class="badge">Vitest 3</span>
+          <span class="badge">electron-builder</span>
+        </div>
+      </section>
+
+      <section>
+        <h2>Getting Started</h2>
+        <div class="steps">
+          <div class="step">
+            <span class="step-num">1</span>
+            <div>
+              <h3>Clone &amp; install</h3>
+              <pre><code>git clone &lt;repo-url&gt;
+cd differ
+npm install</code></pre>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">2</span>
+            <div>
+              <h3>Develop</h3>
+              <pre><code>npm run dev</code></pre>
+              <p>Launches the Electron app with hot-reload.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">3</span>
+            <div>
+              <h3>Build &amp; package</h3>
+              <pre><code>npm run build
+npx electron-builder --mac   # or --win</code></pre>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-num">4</span>
+            <div>
+              <h3>Test</h3>
+              <pre><code>npm test</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Architecture</h2>
+        <p>
+          Differ uses Electron's main/renderer split with a secure preload
+          bridge. The renderer is a React 19 SPA compiled with the React
+          Compiler babel plugin. Git operations run in the main process via
+          <code>simple-git</code>, and file system changes are watched and
+          debounced before notifying the renderer over IPC.
+        </p>
+        <div class="grid" style="margin-top: 1.5rem">
+          <div class="card">
+            <h3>IPC channels</h3>
+            <p>
+              Minimal, focused channels: folder picker, file list, diff
+              fetching, repo watching, and login-item settings.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Diff parsing</h3>
+            <p>
+              Unified diff output is converted into aligned left/right line
+              arrays for row-aligned side-by-side rendering.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Comment threads</h3>
+            <p>
+              In-memory per session. Threads snapshot line content at creation
+              and are flagged outdated when code changes.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p>
+          MIT License &middot; <a href="https://github.com">View on GitHub</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

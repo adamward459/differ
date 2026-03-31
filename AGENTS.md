@@ -17,10 +17,26 @@ This is a performance-critical, low-memory Electron application. All code contri
 
 ## File Structure
 
-- Keep components in `src/renderer/src/components/`, one component per file.
+- Keep components organized by feature in `src/renderer/src/components/<feature>/`, one component per file.
+  - `diff/` — DiffPanel, DiffColumn, DiffLineRow
+  - `sidebar/` — Sidebar, FileItem
+  - `comments/` — CommentThread
+  - `common/` — Reusable components shared across features (StatusBadge, DiffStats, StatusMessage, LandingView, Button, IconButton)
 - Keep shared types in `src/renderer/src/types.ts`.
+- Keep custom hooks in `src/renderer/src/hooks/`.
 - Keep mock/static data in `src/renderer/src/data/`.
+- Keep tests in `src/renderer/src/__tests__/`.
 - `App.tsx` should be a thin shell that composes components — no large inline markup.
+
+## SOLID Principles
+
+All code must follow SOLID principles:
+
+- Single Responsibility (SRP): Each module, component, and function should have one reason to change. Extract logic into custom hooks, utility functions, and focused components.
+- Open/Closed (OCP): Components should be open for extension (via props, composition, render slots) but closed for modification. Prefer composable patterns over editing existing components.
+- Liskov Substitution (LSP): Subtypes and component variants must be interchangeable. Shared interfaces/types must be honored by all implementations.
+- Interface Segregation (ISP): Keep prop interfaces and type definitions small and focused. Don't force consumers to depend on props they don't use.
+- Dependency Inversion (DIP): High-level components should depend on abstractions (hooks, interfaces), not concrete implementations. Extract side effects and data-fetching into hooks or services.
 
 ## Rules
 

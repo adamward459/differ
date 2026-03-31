@@ -1,7 +1,9 @@
 import { memo, useCallback, useRef } from "react";
-import { RiGitBranchLine, RiFolderOpenLine } from "@remixicon/react";
+import { RiFolderOpenLine } from "@remixicon/react";
 import FileItem from "./FileItem";
-import type { FileEntry } from "../types";
+import IconButton from "../common/IconButton";
+import type { FileEntry } from "../../types";
+import logoSrc from "../../assets/Logo.png";
 
 const Sidebar = memo(function Sidebar({
   files,
@@ -50,21 +52,22 @@ const Sidebar = memo(function Sidebar({
       <div className="px-4 pt-5 pb-4 border-b border-border">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-accent-soft flex items-center justify-center">
-              <RiGitBranchLine className="w-4 h-4 text-accent" />
-            </div>
+            <img
+              src={logoSrc}
+              alt="Differ logo"
+              className="w-9 h-9 rounded-lg"
+            />
             <h1 className="text-[15px] font-semibold tracking-tight text-text">
               Differ
             </h1>
           </div>
-          <button
+          <IconButton
+            icon={RiFolderOpenLine}
+            variant="ghost"
             onClick={onOpenFolder}
-            className="p-1.5 rounded-lg hover:bg-item-hover text-text-muted hover:text-text-secondary transition-all duration-150"
             aria-label="Open folder"
             title="Open folder"
-          >
-            <RiFolderOpenLine className="w-4 h-4" />
-          </button>
+          />
         </div>
         <div className="text-[11px] font-medium uppercase tracking-widest text-text-muted">
           {files.length} changed {files.length === 1 ? "file" : "files"}

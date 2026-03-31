@@ -21,3 +21,8 @@ interface DifferAPI {
 interface Window {
   api: DifferAPI;
 }
+
+declare module "*.png" {
+  const src: string;
+  export default src;
+}

@@ -1,6 +1,7 @@
 import { memo, useState, useCallback, useRef, useEffect } from "react";
 import { RiSendPlaneFill, RiCloseLine, RiHistoryLine } from "@remixicon/react";
-import type { Comment } from "../types";
+import IconButton from "../common/IconButton";
+import type { Comment } from "../../types";
 
 const CommentThread = memo(function CommentThread({
   comments,
@@ -72,23 +73,23 @@ const CommentThread = memo(function CommentThread({
           rows={2}
           className="flex-1 text-[12px] bg-comment-input-bg text-text rounded-lg px-3 py-2 resize-none border border-border-subtle focus:border-accent focus:ring-1 focus:ring-accent/20 focus:outline-none transition-all duration-150"
         />
-        <button
+        <IconButton
+          icon={RiSendPlaneFill}
+          variant="accent"
+          size="sm"
           onClick={handleSubmit}
           disabled={!value.trim()}
-          className="shrink-0 p-2 rounded-lg text-accent hover:bg-accent-soft disabled:opacity-30 transition-all duration-150"
           aria-label="Submit comment"
           title="Submit comment"
-        >
-          <RiSendPlaneFill className="w-3.5 h-3.5" />
-        </button>
-        <button
+        />
+        <IconButton
+          icon={RiCloseLine}
+          variant="ghost"
+          size="sm"
           onClick={onClose}
-          className="shrink-0 p-2 rounded-lg text-text-muted hover:bg-item-hover hover:text-text-secondary transition-all duration-150"
           aria-label="Close comment"
           title="Close comment"
-        >
-          <RiCloseLine className="w-3.5 h-3.5" />
-        </button>
+        />
       </div>
     </div>
   );

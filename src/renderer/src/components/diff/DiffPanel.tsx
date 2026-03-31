@@ -1,28 +1,16 @@
 import { memo, useRef, useCallback, useMemo, useState } from "react";
 import { RiFileCopyLine, RiCheckLine } from "@remixicon/react";
 import DiffColumn from "./DiffColumn";
+import StatusBadge from "../common/StatusBadge";
+import DiffStats from "../common/DiffStats";
+import Button from "../common/Button";
 import type {
   DiffLine,
   DiffSide,
-  Comment,
   CommentThread,
+  ThreadMap,
   FileEntry,
-} from "../types";
-
-interface ThreadMap {
-  [line: number]: { comments: Comment[]; outdated: boolean };
-}
-
-const statusBadge: Record<
-  NonNullable<FileEntry["status"]>,
-  { label: string; cls: string }
-> = {
-  modified: { label: "modified", cls: "bg-badge-bg text-badge-text" },
-  added: { label: "added", cls: "bg-diff-add-bg text-diff-add" },
-  untracked: { label: "untracked", cls: "bg-diff-add-bg text-diff-add" },
-  deleted: { label: "deleted", cls: "bg-diff-rm-bg text-diff-rm" },
-  renamed: { label: "renamed", cls: "bg-badge-bg text-badge-text" },
-};
+} from "../../types";
 
 const DiffPanel = memo(function DiffPanel({
   leftLines,
@@ -97,36 +85,23 @@ const DiffPanel = memo(function DiffPanel({
           <span className="text-[13px] font-mono font-medium text-text truncate">
             {fileName}
           </span>
-          {status && (
-            <span
-              className={`shrink-0 text-[11px] font-medium px-2.5 py-0.5 rounded-full ${statusBadge[status]?.cls ?? "bg-badge-bg text-badge-text"}`}
-            >
-              {statusBadge[status]?.label ?? status}
-            </span>
-          )}
+          {status && <StatusBadge status={status} />}
         </div>
         <div className="flex items-center gap-2 text-[12px] font-mono">
           {activeNonOutdatedThreads.length > 0 && (
-            <button
+            <Button
+              icon={copied ? RiCheckLine : RiFileCopyLine}
+              variant={copied ? "accent" : "ghost"}
+              size="sm"
               onClick={handleCopyComments}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg transition-all duration-150 text-[11px] font-sans ${copied ? "text-diff-add" : "text-text-muted hover:text-text-secondary hover:bg-item-hover"}`}
               aria-label="Copy all comments"
               title="Copy all comments (excludes outdated)"
+              className={copied ? "text-diff-add" : ""}
             >
-              {copied ? (
-                <RiCheckLine className="w-3.5 h-3.5" />
-              ) : (
-                <RiFileCopyLine className="w-3.5 h-3.5" />
-              )}
-              <span>{copied ? "Copied" : "Copy comments"}</span>
-            </button>
+              {copied ? "Copied" : "Copy comments"}
+            </Button>
           )}
-          <span className="px-2 py-0.5 rounded-md bg-diff-add-bg text-diff-add font-medium">
-            +{additions}
-          </span>
-          <span className="px-2 py-0.5 rounded-md bg-diff-rm-bg text-diff-rm font-medium">
-            −{deletions}
-          </span>
+          <DiffStats additions={additions} deletions={deletions} />
         </div>
       </div>
 

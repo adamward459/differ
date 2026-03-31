@@ -31,3 +31,7 @@ export interface CommentThread {
   /** Thread is outdated when the diff line content has changed */
   outdated?: boolean;
 }
+
+export interface ThreadMap {
+  [line: number]: { comments: Comment[]; outdated: boolean };
+}

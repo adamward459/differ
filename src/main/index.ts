@@ -1,14 +1,26 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from "electron";
+import {
+  app,
+  shell,
+  BrowserWindow,
+  ipcMain,
+  dialog,
+  nativeImage,
+} from "electron";
 import { join } from "path";
 import { watch, type FSWatcher } from "fs";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import simpleGit from "simple-git";
 
 function createWindow(): void {
+  const icon = nativeImage.createFromPath(
+    join(__dirname, "../../resources/Logo.png"),
+  );
+
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     show: false,
+    icon,
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
@@ -158,6 +170,11 @@ ipcMain.handle("unwatch-repo", () => {
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId("com.differ");
+
+  const iconPath = join(__dirname, "../../resources/Logo.png");
+  if (process.platform === "darwin") {
+    app.dock.setIcon(nativeImage.createFromPath(iconPath));
+  }
 
   app.on("browser-window-created", (_, window) => {
     optimizer.watchWindowShortcuts(window);

@@ -1,1 +1,150 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * OS-adaptive theme using prefers-color-scheme.
+ * Surfaces, borders, and text scale from light to dark automatically.
+ */
+
+@theme {
+  /* Surface colors */
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-overlay: var(--surface-overlay);
+
+  /* Border */
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+
+  /* Text */
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  /* Diff: additions */
+  --color-diff-add-bg: var(--diff-add-bg);
+  --color-diff-add: var(--diff-add);
+  --color-diff-add-gutter: var(--diff-add-gutter);
+
+  /* Diff: removals */
+  --color-diff-rm-bg: var(--diff-rm-bg);
+  --color-diff-rm: var(--diff-rm);
+  --color-diff-rm-gutter: var(--diff-rm-gutter);
+
+  /* Accent */
+  --color-accent: var(--accent);
+
+  /* Badge / tag */
+  --color-badge-bg: var(--badge-bg);
+  --color-badge-text: var(--badge-text);
+
+  /* Active item */
+  --color-item-active: var(--item-active);
+  --color-item-hover: var(--item-hover);
+}
+
+/* ── Light theme (default) ── */
+:root {
+  --surface: oklch(0.985 0 0);
+  --surface-alt: oklch(0.97 0 0);
+  --surface-raised: oklch(0.95 0 0);
+  --surface-overlay: oklch(0.96 0 0 / 0.9);
+
+  --border: oklch(0.88 0 0);
+  --border-subtle: oklch(0.91 0 0);
+
+  --text: oklch(0.15 0 0);
+  --text-secondary: oklch(0.35 0 0);
+  --text-muted: oklch(0.55 0 0);
+
+  --diff-add-bg: oklch(0.92 0.05 145);
+  --diff-add: oklch(0.4 0.12 145);
+  --diff-add-gutter: oklch(0.45 0.12 145);
+
+  --diff-rm-bg: oklch(0.93 0.04 25);
+  --diff-rm: oklch(0.45 0.15 25);
+  --diff-rm-gutter: oklch(0.5 0.15 25);
+
+  --accent: oklch(0.6 0.15 250);
+
+  --badge-bg: oklch(0.93 0 0);
+  --badge-text: oklch(0.5 0 0);
+
+  --item-active: oklch(0.92 0 0);
+  --item-hover: oklch(0.95 0 0);
+
+  color-scheme: light dark;
+}
+
+/* ── Dark theme ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: oklch(0.13 0 0);
+    --surface-alt: oklch(0.16 0.005 250 / 0.5);
+    --surface-raised: oklch(0.22 0 0);
+    --surface-overlay: oklch(0.2 0 0 / 0.9);
+
+    --border: oklch(0.24 0 0);
+    --border-subtle: oklch(0.28 0 0);
+
+    --text: oklch(0.95 0 0);
+    --text-secondary: oklch(0.75 0 0);
+    --text-muted: oklch(0.55 0 0);
+
+    --diff-add-bg: oklch(0.25 0.04 145 / 0.15);
+    --diff-add: oklch(0.75 0.12 145);
+    --diff-add-gutter: oklch(0.55 0.12 145);
+
+    --diff-rm-bg: oklch(0.25 0.04 25 / 0.15);
+    --diff-rm: oklch(0.7 0.12 25);
+    --diff-rm-gutter: oklch(0.5 0.12 25);
+
+    --accent: oklch(0.7 0.15 250);
+
+    --badge-bg: oklch(0.22 0 0);
+    --badge-text: oklch(0.55 0 0);
+
+    --item-active: oklch(0.26 0 0 / 0.6);
+    --item-hover: oklch(0.22 0 0);
+  }
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+/* Thin scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

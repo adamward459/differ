@@ -1,8 +1,6 @@
-import DiffColumn from "./components/DiffColumn";
-import FileItem from "./components/FileItem";
-import type { DiffLine } from "./types";
+import type { DiffLine, FileEntry } from "../types";
 
-const files = [
+export const files: FileEntry[] = [
   { name: "src/utils/parser.ts", additions: 12, deletions: 4 },
   { name: "src/renderer/App.tsx", additions: 45, deletions: 20 },
   { name: "package.json", additions: 2, deletions: 1 },
@@ -12,7 +10,7 @@ const files = [
   { name: ".gitignore", additions: 3, deletions: 0 },
 ];
 
-const leftLines: DiffLine[] = [
+export const leftLines: DiffLine[] = [
   {
     num: 1,
     content: "import { app, BrowserWindow } from 'electron';",
@@ -57,7 +55,7 @@ const leftLines: DiffLine[] = [
   { num: 22, content: "});", type: "unchanged" },
 ];
 
-const rightLines: DiffLine[] = [
+export const rightLines: DiffLine[] = [
   {
     num: 1,
     content: "import { app, BrowserWindow } from 'electron';",
@@ -115,85 +113,3 @@ const rightLines: DiffLine[] = [
   { num: 27, content: "  }", type: "unchanged" },
   { num: 28, content: "});", type: "unchanged" },
 ];
-
-function App(): React.JSX.Element {
-  return (
-    <div className="flex h-screen bg-surface text-text overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-72 shrink-0 border-r border-border flex flex-col bg-surface-alt">
-        {/* Header */}
-        <div className="px-4 py-4 border-b border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <svg
-              className="w-5 h-5 text-accent"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
-              />
-            </svg>
-            <h1 className="text-base font-semibold tracking-tight">Differ</h1>
-          </div>
-          <div className="text-xs text-text-muted">
-            {files.length} files changed
-            <span className="mx-1.5">·</span>
-            <span className="text-diff-add">
-              +{files.reduce((s, f) => s + f.additions, 0)}
-            </span>
-            <span className="mx-1">·</span>
-            <span className="text-diff-rm">
-              −{files.reduce((s, f) => s + f.deletions, 0)}
-            </span>
-          </div>
-        </div>
-
-        {/* File list */}
-        <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
-          {files.map((file, i) => (
-            <FileItem
-              key={file.name}
-              name={file.name}
-              additions={file.additions}
-              deletions={file.deletions}
-              active={i === 1}
-            />
-          ))}
-        </nav>
-      </aside>
-
-      {/* Diff panel */}
-      <main className="flex-1 flex flex-col min-w-0">
-        {/* Toolbar */}
-        <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-border bg-surface-alt">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-sm font-mono text-text-secondary truncate">
-              src/renderer/App.tsx
-            </span>
-            <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-badge-bg text-badge-text">
-              modified
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-xs font-mono text-diff-add">+45</span>
-            <span className="text-xs text-text-muted mx-1">/</span>
-            <span className="text-xs font-mono text-diff-rm">−20</span>
-          </div>
-        </div>
-
-        {/* Side-by-side diff */}
-        <div className="flex-1 flex min-h-0">
-          <DiffColumn lines={leftLines} label="a/src/main/index.ts" />
-          <div className="w-px bg-border shrink-0" />
-          <DiffColumn lines={rightLines} label="b/src/main/index.ts" />
-        </div>
-      </main>
-    </div>
-  );
-}
-
-export default App;

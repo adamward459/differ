@@ -1,4 +1,4 @@
-export type LineType = "added" | "removed" | "unchanged";
+export type LineType = "added" | "removed" | "unchanged" | "placeholder";
 
 export interface DiffLine {
   num: number;
@@ -26,4 +26,8 @@ export interface CommentThread {
   side: DiffSide;
   line: number;
   comments: Comment[];
+  /** Content of the line when the first comment was created */
+  lineContent?: string;
+  /** Thread is outdated when the diff line content has changed */
+  outdated?: boolean;
 }

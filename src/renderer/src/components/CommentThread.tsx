@@ -1,13 +1,15 @@
 import { memo, useState, useCallback, useRef, useEffect } from "react";
-import { RiSendPlaneFill, RiCloseLine } from "@remixicon/react";
+import { RiSendPlaneFill, RiCloseLine, RiHistoryLine } from "@remixicon/react";
 import type { Comment } from "../types";
 
 const CommentThread = memo(function CommentThread({
   comments,
+  outdated,
   onAdd,
   onClose,
 }: {
   comments: Comment[];
+  outdated: boolean;
   onAdd: (body: string) => void;
   onClose: () => void;
 }) {
@@ -39,20 +41,28 @@ const CommentThread = memo(function CommentThread({
   );
 
   return (
-    <div className="border border-comment-border rounded-lg bg-comment-bg mx-2 my-1 shadow-sm">
+    <div className="border border-comment-border rounded-xl bg-comment-bg mx-3 my-1.5 shadow-sm overflow-hidden">
+      {outdated && (
+        <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-badge-bg text-badge-text text-[11px] font-medium border-b border-comment-border">
+          <RiHistoryLine className="w-3.5 h-3.5 shrink-0" />
+          <span>
+            Outdated — this code has changed since these comments were added
+          </span>
+        </div>
+      )}
       {comments.length > 0 && (
         <div className="divide-y divide-comment-border">
           {comments.map(c => (
             <div
               key={c.id}
-              className="px-3 py-2 text-xs text-text-secondary whitespace-pre-wrap"
+              className="px-3.5 py-2.5 text-[12px] leading-relaxed text-text-secondary whitespace-pre-wrap"
             >
               {c.body}
             </div>
           ))}
         </div>
       )}
-      <div className="flex items-start gap-1 p-2 border-t border-comment-border">
+      <div className="flex items-start gap-1.5 p-2.5 border-t border-comment-border">
         <textarea
           ref={inputRef}
           value={value}
@@ -60,20 +70,22 @@ const CommentThread = memo(function CommentThread({
           onKeyDown={handleKeyDown}
           placeholder="Add a comment… (⌘↵ to send)"
           rows={2}
-          className="flex-1 text-xs bg-comment-input-bg text-text rounded px-2 py-1.5 resize-none border border-border-subtle focus:border-accent focus:outline-none"
+          className="flex-1 text-[12px] bg-comment-input-bg text-text rounded-lg px-3 py-2 resize-none border border-border-subtle focus:border-accent focus:ring-1 focus:ring-accent/20 focus:outline-none transition-all duration-150"
         />
         <button
           onClick={handleSubmit}
           disabled={!value.trim()}
-          className="shrink-0 p-1.5 rounded text-accent hover:bg-item-hover disabled:opacity-30 transition-opacity"
+          className="shrink-0 p-2 rounded-lg text-accent hover:bg-accent-soft disabled:opacity-30 transition-all duration-150"
           aria-label="Submit comment"
+          title="Submit comment"
         >
           <RiSendPlaneFill className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={onClose}
-          className="shrink-0 p-1.5 rounded text-text-muted hover:bg-item-hover transition-opacity"
+          className="shrink-0 p-2 rounded-lg text-text-muted hover:bg-item-hover hover:text-text-secondary transition-all duration-150"
           aria-label="Close comment"
+          title="Close comment"
         >
           <RiCloseLine className="w-3.5 h-3.5" />
         </button>

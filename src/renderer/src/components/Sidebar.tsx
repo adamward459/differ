@@ -47,22 +47,27 @@ const Sidebar = memo(function Sidebar({
 
   return (
     <aside className="w-72 shrink-0 border-r border-border flex flex-col bg-surface-alt">
-      <div className="px-4 py-4 border-b border-border">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <RiGitBranchLine className="w-5 h-5 text-accent" />
-            <h1 className="text-base font-semibold tracking-tight">Differ</h1>
+      <div className="px-4 pt-5 pb-4 border-b border-border">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-accent-soft flex items-center justify-center">
+              <RiGitBranchLine className="w-4 h-4 text-accent" />
+            </div>
+            <h1 className="text-[15px] font-semibold tracking-tight text-text">
+              Differ
+            </h1>
           </div>
           <button
             onClick={onOpenFolder}
-            className="p-1.5 rounded-md hover:bg-item-hover text-text-muted hover:text-text-secondary transition-colors"
+            className="p-1.5 rounded-lg hover:bg-item-hover text-text-muted hover:text-text-secondary transition-all duration-150"
             aria-label="Open folder"
+            title="Open folder"
           >
             <RiFolderOpenLine className="w-4 h-4" />
           </button>
         </div>
-        <div className="text-xs text-text-muted">
-          {files.length} files changed
+        <div className="text-[11px] font-medium uppercase tracking-widest text-text-muted">
+          {files.length} changed {files.length === 1 ? "file" : "files"}
         </div>
       </div>
 

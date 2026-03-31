@@ -1,5 +1,7 @@
 import type { DiffLine, FileEntry } from "../types";
 
+const PH: DiffLine = { num: 0, content: "", type: "placeholder" };
+
 export const files: FileEntry[] = [
   { name: "src/utils/parser.ts", additions: 12, deletions: 4 },
   { name: "src/renderer/App.tsx", additions: 45, deletions: 20 },
@@ -9,6 +11,23 @@ export const files: FileEntry[] = [
   { name: "tsconfig.json", additions: 1, deletions: 0 },
   { name: ".gitignore", additions: 3, deletions: 0 },
 ];
+
+// Aligned side-by-side: placeholders keep rows in sync.
+// Row mapping (left / right):
+//  1-5  unchanged / unchanged
+//  6    removed "width: 800"   / added "width: 1200"
+//  7    removed "height: 600"  / added "height: 800"
+//  -    placeholder            / added "minWidth: 600"
+//  8    unchanged "webPreferences" / unchanged
+//  9    removed "preload…"     / added "preload…"
+//  -    placeholder            / added "contextIsolation"
+//  10-12 unchanged             / unchanged
+//  13   removed "win.loadFile" / added "if (MAIN…)"
+//  -    placeholder            / added "win.loadURL…"
+//  -    placeholder            / added "} else {"
+//  -    placeholder            / added "win.loadFile…"
+//  -    placeholder            / added "}"
+//  14-22 unchanged             / unchanged
 
 export const leftLines: DiffLine[] = [
   {
@@ -22,16 +41,22 @@ export const leftLines: DiffLine[] = [
   { num: 5, content: "  const win = new BrowserWindow({", type: "unchanged" },
   { num: 6, content: "    width: 800,", type: "removed" },
   { num: 7, content: "    height: 600,", type: "removed" },
+  PH,
   { num: 8, content: "    webPreferences: {", type: "unchanged" },
   {
     num: 9,
     content: "      preload: path.join(__dirname, 'preload.js'),",
     type: "removed",
   },
+  PH,
   { num: 10, content: "    },", type: "unchanged" },
   { num: 11, content: "  });", type: "unchanged" },
   { num: 12, content: "", type: "unchanged" },
   { num: 13, content: "  win.loadFile('index.html');", type: "removed" },
+  PH,
+  PH,
+  PH,
+  PH,
   { num: 14, content: "}", type: "unchanged" },
   { num: 15, content: "", type: "unchanged" },
   {

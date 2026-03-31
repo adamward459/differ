@@ -5,6 +5,28 @@ import DiffPanel from "./components/DiffPanel";
 import type { FileEntry, DiffLine, DiffSide, CommentThread } from "./types";
 import { parseDiff } from "./utils/parseDiff";
 
+/** Check each thread against current diff lines; mark outdated if content changed. */
+function markOutdatedThreads(
+  threads: CommentThread[],
+  file: string,
+  left: DiffLine[],
+  right: DiffLine[],
+): CommentThread[] {
+  let changed = false;
+  const updated = threads.map(t => {
+    if (t.file !== file || t.lineContent === undefined) return t;
+    const lines = t.side === "left" ? left : right;
+    const current = lines.find(l => l.num === t.line);
+    const isOutdated = !current || current.content !== t.lineContent;
+    if (isOutdated !== !!t.outdated) {
+      changed = true;
+      return { ...t, outdated: isOutdated };
+    }
+    return t;
+  });
+  return changed ? updated : threads;
+}
+
 function App(): React.JSX.Element {
   const [folderPath, setFolderPath] = useState<string | null>(null);
   const [files, setFiles] = useState<FileEntry[]>([]);
@@ -18,6 +40,8 @@ function App(): React.JSX.Element {
   const handleAddComment = useCallback(
     (side: DiffSide, line: number, body: string) => {
       if (!activeFile) return;
+      const lines = side === "left" ? leftLines : rightLines;
+      const lineContent = lines.find(l => l.num === line)?.content ?? "";
       setThreads(prev => {
         const idx = prev.findIndex(
           t => t.file === activeFile && t.side === side && t.line === line,
@@ -32,29 +56,49 @@ function App(): React.JSX.Element {
           updated[idx] = {
             ...updated[idx],
             comments: [...updated[idx].comments, comment],
+            outdated: false,
+            lineContent,
           };
           return updated;
         }
-        return [...prev, { file: activeFile, side, line, comments: [comment] }];
+        return [
+          ...prev,
+          {
+            file: activeFile,
+            side,
+            line,
+            comments: [comment],
+            lineContent,
+            outdated: false,
+          },
+        ];
       });
     },
-    [activeFile],
+    [activeFile, leftLines, rightLines],
   );
 
   const leftThreads = useMemo(() => {
-    const map: Record<number, CommentThread["comments"]> = {};
+    const map: Record<
+      number,
+      { comments: CommentThread["comments"]; outdated: boolean }
+    > = {};
     if (!activeFile) return map;
     for (const t of threads) {
-      if (t.file === activeFile && t.side === "left") map[t.line] = t.comments;
+      if (t.file === activeFile && t.side === "left")
+        map[t.line] = { comments: t.comments, outdated: !!t.outdated };
     }
     return map;
   }, [threads, activeFile]);
 
   const rightThreads = useMemo(() => {
-    const map: Record<number, CommentThread["comments"]> = {};
+    const map: Record<
+      number,
+      { comments: CommentThread["comments"]; outdated: boolean }
+    > = {};
     if (!activeFile) return map;
     for (const t of threads) {
-      if (t.file === activeFile && t.side === "right") map[t.line] = t.comments;
+      if (t.file === activeFile && t.side === "right")
+        map[t.line] = { comments: t.comments, outdated: !!t.outdated };
     }
     return map;
   }, [threads, activeFile]);
@@ -101,14 +145,17 @@ function App(): React.JSX.Element {
       const result = await window.api.getFileDiff(folderPath, fileName);
       if (result.error) return;
 
+      let left: DiffLine[];
+      let right: DiffLine[];
       if (result.raw) {
-        const { left, right } = parseDiff(result.raw);
-        setLeftLines(left);
-        setRightLines(right);
+        ({ left, right } = parseDiff(result.raw));
       } else {
-        setLeftLines((result.leftLines as DiffLine[]) ?? []);
-        setRightLines((result.rightLines as DiffLine[]) ?? []);
+        left = (result.leftLines as DiffLine[]) ?? [];
+        right = (result.rightLines as DiffLine[]) ?? [];
       }
+      setLeftLines(left);
+      setRightLines(right);
+      setThreads(prev => markOutdatedThreads(prev, fileName, left, right));
     },
     [folderPath],
   );
@@ -146,14 +193,17 @@ function App(): React.JSX.Element {
         if (stillExists) {
           const diffResult = await window.api.getFileDiff(fp, af);
           if (!diffResult.error) {
+            let left: DiffLine[];
+            let right: DiffLine[];
             if (diffResult.raw) {
-              const { left, right } = parseDiff(diffResult.raw);
-              setLeftLines(left);
-              setRightLines(right);
+              ({ left, right } = parseDiff(diffResult.raw));
             } else {
-              setLeftLines((diffResult.leftLines as DiffLine[]) ?? []);
-              setRightLines((diffResult.rightLines as DiffLine[]) ?? []);
+              left = (diffResult.leftLines as DiffLine[]) ?? [];
+              right = (diffResult.rightLines as DiffLine[]) ?? [];
             }
+            setLeftLines(left);
+            setRightLines(right);
+            setThreads(prev => markOutdatedThreads(prev, af, left, right));
           }
         } else {
           // File no longer changed — clear diff
@@ -174,13 +224,25 @@ function App(): React.JSX.Element {
   if (!folderPath) {
     return (
       <div className="flex h-screen items-center justify-center bg-surface text-text">
-        <button
-          onClick={handleOpenFolder}
-          className="flex items-center gap-2 px-5 py-3 rounded-lg bg-accent text-white text-sm font-medium hover:opacity-90 transition-opacity"
-        >
-          <RiFolderOpenLine className="w-5 h-5" />
-          Open Folder
-        </button>
+        <div className="flex flex-col items-center gap-5">
+          <div className="w-14 h-14 rounded-2xl bg-accent-soft flex items-center justify-center">
+            <RiFolderOpenLine className="w-7 h-7 text-accent" />
+          </div>
+          <div className="text-center">
+            <p className="text-[15px] font-semibold text-text mb-1">
+              Open a repository
+            </p>
+            <p className="text-[13px] text-text-muted">
+              Select a folder to view its changes
+            </p>
+          </div>
+          <button
+            onClick={handleOpenFolder}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white text-[13px] font-medium hover:opacity-90 transition-opacity shadow-sm"
+          >
+            Open Folder
+          </button>
+        </div>
       </div>
     );
   }
@@ -195,14 +257,19 @@ function App(): React.JSX.Element {
       />
 
       {loading && (
-        <div className="flex-1 flex items-center justify-center text-text-muted text-sm">
-          Loading…
+        <div className="flex-1 flex items-center justify-center text-text-muted text-[13px]">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+            <span>Loading…</span>
+          </div>
         </div>
       )}
 
       {error && (
-        <div className="flex-1 flex items-center justify-center text-diff-rm text-sm">
-          {error}
+        <div className="flex-1 flex items-center justify-center text-[13px]">
+          <div className="px-4 py-3 rounded-xl bg-diff-rm-bg text-diff-rm">
+            {error}
+          </div>
         </div>
       )}
 
@@ -213,14 +280,16 @@ function App(): React.JSX.Element {
           fileName={activeFile}
           additions={rightLines.filter(l => l.type === "added").length}
           deletions={leftLines.filter(l => l.type === "removed").length}
+          status={files.find(f => f.name === activeFile)?.status}
           leftThreads={leftThreads}
           rightThreads={rightThreads}
           onAddComment={handleAddComment}
+          threads={threads}
         />
       )}
 
       {!loading && !error && !activeFile && (
-        <div className="flex-1 flex items-center justify-center text-text-muted text-sm">
+        <div className="flex-1 flex items-center justify-center text-text-muted text-[13px]">
           Select a file to view its diff
         </div>
       )}

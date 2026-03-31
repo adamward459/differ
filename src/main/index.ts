@@ -45,6 +45,14 @@ function createWindow(): void {
 
 // ── IPC Handlers ──
 
+ipcMain.handle("get-open-at-login", () => {
+  return app.getLoginItemSettings().openAtLogin;
+});
+
+ipcMain.handle("set-open-at-login", (_event, enabled: boolean) => {
+  app.setLoginItemSettings({ openAtLogin: enabled });
+});
+
 ipcMain.handle("open-folder", async event => {
   const win = BrowserWindow.fromWebContents(event.sender);
   const result = await dialog.showOpenDialog(win!, {
@@ -169,13 +177,6 @@ ipcMain.handle("unwatch-repo", () => {
 // ── App lifecycle ──
 
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId("com.differ");
-
-  const iconPath = join(__dirname, "../../resources/Logo.png");
-  if (process.platform === "darwin") {
-    app.dock.setIcon(nativeImage.createFromPath(iconPath));
-  }
-
   app.on("browser-window-created", (_, window) => {
     optimizer.watchWindowShortcuts(window);
   });

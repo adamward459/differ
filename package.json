@@ -1,6 +1,7 @@
 {
   "name": "differ",
   "version": "1.0.0",
+  "productName": "Differ",
   "description": "Diff viewer with syntax highlighting",
   "main": "./out/main/index.js",
   "scripts": {
@@ -35,5 +36,23 @@
     "typescript": "5.7.2",
     "vite": "6.0.0",
     "vitest": "3.2.4"
+  },
+  "build": {
+    "appId": "com.differ.app",
+    "productName": "Differ",
+    "directories": {
+      "buildResources": "build"
+    },
+    "mac": {
+      "icon": "build/icon.icns",
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "icon": "build/icon.png"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Development"
+    }
   }
 }

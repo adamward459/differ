@@ -1,4 +1,6 @@
 interface DifferAPI {
+  getOpenAtLogin(): Promise<boolean>;
+  setOpenAtLogin(enabled: boolean): Promise<void>;
   openFolder(): Promise<string | null>;
   getChangedFiles(folderPath: string): Promise<{
     files?: { name: string; status: string }[];

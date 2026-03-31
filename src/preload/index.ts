@@ -2,6 +2,10 @@ import { contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
 
 const api = {
+  getOpenAtLogin: (): Promise<boolean> =>
+    ipcRenderer.invoke("get-open-at-login"),
+  setOpenAtLogin: (enabled: boolean): Promise<void> =>
+    ipcRenderer.invoke("set-open-at-login", enabled),
   openFolder: (): Promise<string | null> => ipcRenderer.invoke("open-folder"),
   getChangedFiles: (
     folderPath: string,

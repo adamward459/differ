@@ -4,6 +4,7 @@ import FileItem from "./FileItem";
 import IconButton from "../common/IconButton";
 import type { FileEntry } from "../../types";
 import logoSrc from "../../assets/Logo.png";
+import { useStartup } from "../../hooks/useStartup";
 
 const Sidebar = memo(function Sidebar({
   files,
@@ -17,6 +18,7 @@ const Sidebar = memo(function Sidebar({
   onOpenFolder: () => void;
 }) {
   const navRef = useRef<HTMLElement>(null);
+  const { openAtLogin, toggleOpenAtLogin } = useStartup();
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLElement>) => {
@@ -93,6 +95,17 @@ const Sidebar = memo(function Sidebar({
           />
         ))}
       </nav>
+      <div className="px-4 py-3 border-t border-border">
+        <label className="flex items-center gap-2 text-xs text-text-muted cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={openAtLogin}
+            onChange={toggleOpenAtLogin}
+            className="accent-accent w-3.5 h-3.5"
+          />
+          Open at startup
+        </label>
+      </div>
     </aside>
   );
 });

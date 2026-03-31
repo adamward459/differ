@@ -10,4 +10,5 @@ export interface FileEntry {
   name: string;
   additions: number;
   deletions: number;
+  status?: "modified" | "added" | "untracked" | "deleted" | "renamed";
 }

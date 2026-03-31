@@ -1,5 +1,3 @@
-import { ElectronAPI } from "@electron-toolkit/preload";
-
 interface DifferAPI {
   openFolder(): Promise<string | null>;
   getChangedFiles(folderPath: string): Promise<{
@@ -17,9 +15,6 @@ interface DifferAPI {
   }>;
 }
 
-declare global {
-  interface Window {
-    electron: ElectronAPI;
-    api: DifferAPI;
-  }
+interface Window {
+  api: DifferAPI;
 }

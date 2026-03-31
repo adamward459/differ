@@ -1,197 +1,121 @@
-import DiffColumn from "./components/DiffColumn";
-import FileItem from "./components/FileItem";
-import type { DiffLine } from "./types";
-
-const files = [
-  { name: "src/utils/parser.ts", additions: 12, deletions: 4 },
-  { name: "src/renderer/App.tsx", additions: 45, deletions: 20 },
-  { name: "package.json", additions: 2, deletions: 1 },
-  { name: "src/main/index.ts", additions: 8, deletions: 0 },
-  { name: "README.md", additions: 5, deletions: 3 },
-  { name: "tsconfig.json", additions: 1, deletions: 0 },
-  { name: ".gitignore", additions: 3, deletions: 0 },
-];
-
-const leftLines: DiffLine[] = [
-  {
-    num: 1,
-    content: "import { app, BrowserWindow } from 'electron';",
-    type: "unchanged",
-  },
-  { num: 2, content: "import path from 'path';", type: "unchanged" },
-  { num: 3, content: "", type: "unchanged" },
-  { num: 4, content: "function createWindow() {", type: "unchanged" },
-  { num: 5, content: "  const win = new BrowserWindow({", type: "unchanged" },
-  { num: 6, content: "    width: 800,", type: "removed" },
-  { num: 7, content: "    height: 600,", type: "removed" },
-  { num: 8, content: "    webPreferences: {", type: "unchanged" },
-  {
-    num: 9,
-    content: "      preload: path.join(__dirname, 'preload.js'),",
-    type: "removed",
-  },
-  { num: 10, content: "    },", type: "unchanged" },
-  { num: 11, content: "  });", type: "unchanged" },
-  { num: 12, content: "", type: "unchanged" },
-  { num: 13, content: "  win.loadFile('index.html');", type: "removed" },
-  { num: 14, content: "}", type: "unchanged" },
-  { num: 15, content: "", type: "unchanged" },
-  {
-    num: 16,
-    content: "app.whenReady().then(createWindow);",
-    type: "unchanged",
-  },
-  { num: 17, content: "", type: "unchanged" },
-  {
-    num: 18,
-    content: "app.on('window-all-closed', () => {",
-    type: "unchanged",
-  },
-  {
-    num: 19,
-    content: "  if (process.platform !== 'darwin') {",
-    type: "unchanged",
-  },
-  { num: 20, content: "    app.quit();", type: "unchanged" },
-  { num: 21, content: "  }", type: "unchanged" },
-  { num: 22, content: "});", type: "unchanged" },
-];
-
-const rightLines: DiffLine[] = [
-  {
-    num: 1,
-    content: "import { app, BrowserWindow } from 'electron';",
-    type: "unchanged",
-  },
-  { num: 2, content: "import path from 'path';", type: "unchanged" },
-  { num: 3, content: "", type: "unchanged" },
-  { num: 4, content: "function createWindow() {", type: "unchanged" },
-  { num: 5, content: "  const win = new BrowserWindow({", type: "unchanged" },
-  { num: 6, content: "    width: 1200,", type: "added" },
-  { num: 7, content: "    height: 800,", type: "added" },
-  { num: 8, content: "    minWidth: 600,", type: "added" },
-  { num: 9, content: "    webPreferences: {", type: "unchanged" },
-  {
-    num: 10,
-    content: "      preload: path.join(__dirname, 'preload.js'),",
-    type: "added",
-  },
-  { num: 11, content: "      contextIsolation: true,", type: "added" },
-  { num: 12, content: "    },", type: "unchanged" },
-  { num: 13, content: "  });", type: "unchanged" },
-  { num: 14, content: "", type: "unchanged" },
-  {
-    num: 15,
-    content: "  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {",
-    type: "added",
-  },
-  {
-    num: 16,
-    content: "    win.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);",
-    type: "added",
-  },
-  { num: 17, content: "  } else {", type: "added" },
-  { num: 18, content: "    win.loadFile('index.html');", type: "added" },
-  { num: 19, content: "  }", type: "added" },
-  { num: 20, content: "}", type: "unchanged" },
-  { num: 21, content: "", type: "unchanged" },
-  {
-    num: 22,
-    content: "app.whenReady().then(createWindow);",
-    type: "unchanged",
-  },
-  { num: 23, content: "", type: "unchanged" },
-  {
-    num: 24,
-    content: "app.on('window-all-closed', () => {",
-    type: "unchanged",
-  },
-  {
-    num: 25,
-    content: "  if (process.platform !== 'darwin') {",
-    type: "unchanged",
-  },
-  { num: 26, content: "    app.quit();", type: "unchanged" },
-  { num: 27, content: "  }", type: "unchanged" },
-  { num: 28, content: "});", type: "unchanged" },
-];
+import { useState, useCallback } from "react";
+import { RiFolderOpenLine } from "@remixicon/react";
+import Sidebar from "./components/Sidebar";
+import DiffPanel from "./components/DiffPanel";
+import type { FileEntry, DiffLine } from "./types";
+import { parseDiff } from "./utils/parseDiff";
 
 function App(): React.JSX.Element {
+  const [folderPath, setFolderPath] = useState<string | null>(null);
+  const [files, setFiles] = useState<FileEntry[]>([]);
+  const [activeFile, setActiveFile] = useState<string | null>(null);
+  const [leftLines, setLeftLines] = useState<DiffLine[]>([]);
+  const [rightLines, setRightLines] = useState<DiffLine[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleOpenFolder = useCallback(async () => {
+    const selected = await window.api.openFolder();
+    if (!selected) return;
+
+    setFolderPath(selected);
+    setLoading(true);
+    setError(null);
+    setActiveFile(null);
+    setLeftLines([]);
+    setRightLines([]);
+
+    const result = await window.api.getChangedFiles(selected);
+    setLoading(false);
+
+    if (result.error) {
+      setError(result.error);
+      setFiles([]);
+      return;
+    }
+
+    const entries: FileEntry[] = (result.files ?? []).map(
+      (f: { name: string; status: string }) => ({
+        name: f.name,
+        additions: 0,
+        deletions: 0,
+        status: f.status as FileEntry["status"],
+      }),
+    );
+    setFiles(entries);
+  }, []);
+
+  const handleSelectFile = useCallback(
+    async (fileName: string) => {
+      if (!folderPath) return;
+      setActiveFile(fileName);
+
+      const result = await window.api.getFileDiff(folderPath, fileName);
+      if (result.error) return;
+
+      if (result.raw) {
+        const { left, right } = parseDiff(result.raw);
+        setLeftLines(left);
+        setRightLines(right);
+      } else {
+        setLeftLines((result.leftLines as DiffLine[]) ?? []);
+        setRightLines((result.rightLines as DiffLine[]) ?? []);
+      }
+    },
+    [folderPath],
+  );
+
+  // No folder selected — show landing
+  if (!folderPath) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-surface text-text">
+        <button
+          onClick={handleOpenFolder}
+          className="flex items-center gap-2 px-5 py-3 rounded-lg bg-accent text-white text-sm font-medium hover:opacity-90 transition-opacity"
+        >
+          <RiFolderOpenLine className="w-5 h-5" />
+          Open Folder
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-surface text-text overflow-hidden">
-      {/* Sidebar */}
-      <aside className="w-72 shrink-0 border-r border-border flex flex-col bg-surface-alt">
-        {/* Header */}
-        <div className="px-4 py-4 border-b border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <svg
-              className="w-5 h-5 text-accent"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
-              />
-            </svg>
-            <h1 className="text-base font-semibold tracking-tight">Differ</h1>
-          </div>
-          <div className="text-xs text-text-muted">
-            {files.length} files changed
-            <span className="mx-1.5">·</span>
-            <span className="text-diff-add">
-              +{files.reduce((s, f) => s + f.additions, 0)}
-            </span>
-            <span className="mx-1">·</span>
-            <span className="text-diff-rm">
-              −{files.reduce((s, f) => s + f.deletions, 0)}
-            </span>
-          </div>
-        </div>
+      <Sidebar
+        files={files}
+        activeFile={activeFile}
+        onSelectFile={handleSelectFile}
+        onOpenFolder={handleOpenFolder}
+      />
 
-        {/* File list */}
-        <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
-          {files.map((file, i) => (
-            <FileItem
-              key={file.name}
-              name={file.name}
-              additions={file.additions}
-              deletions={file.deletions}
-              active={i === 1}
-            />
-          ))}
-        </nav>
-      </aside>
-
-      {/* Diff panel */}
-      <main className="flex-1 flex flex-col min-w-0">
-        {/* Toolbar */}
-        <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-border bg-surface-alt">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-sm font-mono text-text-secondary truncate">
-              src/renderer/App.tsx
-            </span>
-            <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-badge-bg text-badge-text">
-              modified
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-xs font-mono text-diff-add">+45</span>
-            <span className="text-xs text-text-muted mx-1">/</span>
-            <span className="text-xs font-mono text-diff-rm">−20</span>
-          </div>
+      {loading && (
+        <div className="flex-1 flex items-center justify-center text-text-muted text-sm">
+          Loading…
         </div>
+      )}
 
-        {/* Side-by-side diff */}
-        <div className="flex-1 flex min-h-0">
-          <DiffColumn lines={leftLines} label="a/src/main/index.ts" />
-          <div className="w-px bg-border shrink-0" />
-          <DiffColumn lines={rightLines} label="b/src/main/index.ts" />
+      {error && (
+        <div className="flex-1 flex items-center justify-center text-diff-rm text-sm">
+          {error}
         </div>
-      </main>
+      )}
+
+      {!loading && !error && activeFile && (
+        <DiffPanel
+          leftLines={leftLines}
+          rightLines={rightLines}
+          fileName={activeFile}
+          additions={rightLines.filter(l => l.type === "added").length}
+          deletions={leftLines.filter(l => l.type === "removed").length}
+        />
+      )}
+
+      {!loading && !error && !activeFile && (
+        <div className="flex-1 flex items-center justify-center text-text-muted text-sm">
+          Select a file to view its diff
+        </div>
+      )}
     </div>
   );
 }

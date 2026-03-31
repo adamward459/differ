@@ -42,11 +42,8 @@ const DiffPanel = memo(function DiffPanel({
   const syncing = useRef(false);
 
   const activeNonOutdatedThreads = useMemo(
-    () =>
-      threads.filter(
-        t => t.file === fileName && !t.outdated && t.comments.length > 0,
-      ),
-    [threads, fileName],
+    () => threads.filter(t => !t.outdated && t.comments.length > 0),
+    [threads],
   );
 
   const [copied, setCopied] = useState(false);

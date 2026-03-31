@@ -34,12 +34,16 @@ const FileItem = memo(function FileItem({
 }) {
   return (
     <button
+      data-file-item
+      role="option"
+      aria-selected={active}
+      tabIndex={active ? 0 : -1}
       onClick={onClick}
       className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
         active
           ? "bg-item-active text-text"
           : "text-text-muted hover:bg-item-hover hover:text-text-secondary"
-      }`}
+      } focus-visible:outline-2 focus-visible:outline-accent`}
     >
       <div className="flex items-center gap-2 min-w-0">
         <RiFileCodeLine className="shrink-0 w-4 h-4 text-text-muted" />

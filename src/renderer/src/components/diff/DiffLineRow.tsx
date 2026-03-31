@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { RiAddLine, RiChat3Line } from "@remixicon/react";
-import type { DiffLine, LineType } from "../../types";
+import IconButton from "../common/IconButton";
+import type { DiffLine, DiffSide, LineType } from "../../types";
 
 const lineColor: Record<LineType, string> = {
   added: "bg-diff-add-bg text-diff-add",
@@ -23,23 +24,68 @@ const prefixChar: Record<LineType, string> = {
   placeholder: " ",
 };
 
-const DiffLineRow = memo(function DiffLineRow({
-  line,
+function ActionButtons({
+  lineNum,
   hasThread,
   isOpen,
   onToggle,
+  onOpen,
 }: {
-  line: DiffLine;
+  lineNum: number;
   hasThread: boolean;
   isOpen: boolean;
   onToggle: (lineNum: number) => void;
+  onOpen: (lineNum: number) => void;
+}) {
+  return (
+    <span className="shrink-0 flex items-center px-1 gap-0.5">
+      {hasThread && !isOpen && (
+        <IconButton
+          icon={RiChat3Line}
+          variant="accent"
+          size="sm"
+          onClick={() => onToggle(lineNum)}
+          className="!p-0.5 !rounded-md"
+          aria-label={`View comments on line ${lineNum}`}
+          title={`View comments on line ${lineNum}`}
+        />
+      )}
+      <IconButton
+        icon={RiAddLine}
+        variant="ghost"
+        size="sm"
+        onClick={() => onOpen(lineNum)}
+        className="!p-0.5 !rounded-md opacity-0 group-hover/line:opacity-100"
+        aria-label={`Add comment on line ${lineNum}`}
+        title={`Add comment on line ${lineNum}`}
+      />
+    </span>
+  );
+}
+
+const DiffLineRow = memo(function DiffLineRow({
+  line,
+  side,
+  hasThread,
+  isOpen,
+  onToggle,
+  onOpen,
+}: {
+  line: DiffLine;
+  side: DiffSide;
+  hasThread: boolean;
+  isOpen: boolean;
+  onToggle: (lineNum: number) => void;
+  onOpen: (lineNum: number) => void;
 }) {
   if (line.type === "placeholder") {
     return (
       <div className={`flex ${lineColor.placeholder}`}>
+        {side === "right" && <span className="shrink-0 w-6">&nbsp;</span>}
         <span className="shrink-0 w-12">&nbsp;</span>
         <span className="shrink-0 w-5">&nbsp;</span>
         <span className="flex-1">&nbsp;</span>
+        {side === "left" && <span className="shrink-0 w-6">&nbsp;</span>}
       </div>
     );
   }
@@ -48,6 +94,15 @@ const DiffLineRow = memo(function DiffLineRow({
     <div
       className={`group/line flex ${lineColor[line.type]} relative transition-colors duration-75`}
     >
+      {side === "right" && (
+        <ActionButtons
+          lineNum={line.num}
+          hasThread={hasThread}
+          isOpen={isOpen}
+          onToggle={onToggle}
+          onOpen={onOpen}
+        />
+      )}
       <span
         className={`shrink-0 w-12 text-right pr-3 select-none text-[12px] ${gutterColor[line.type]}`}
       >
@@ -67,26 +122,15 @@ const DiffLineRow = memo(function DiffLineRow({
       <span className="whitespace-pre-wrap break-all pr-4 flex-1">
         {line.content || " "}
       </span>
-      <span className="shrink-0 flex items-center pr-2 gap-0.5">
-        {hasThread && !isOpen && (
-          <button
-            onClick={() => onToggle(line.num)}
-            className="p-0.5 rounded-md text-accent hover:bg-accent-soft transition-colors duration-150"
-            aria-label={`View comments on line ${line.num}`}
-            title={`View comments on line ${line.num}`}
-          >
-            <RiChat3Line className="w-3.5 h-3.5" />
-          </button>
-        )}
-        <button
-          onClick={() => onToggle(line.num)}
-          className="p-0.5 rounded-md text-text-muted hover:text-accent hover:bg-accent-soft opacity-0 group-hover/line:opacity-100 transition-all duration-150"
-          aria-label={`Add comment on line ${line.num}`}
-          title={`Add comment on line ${line.num}`}
-        >
-          <RiAddLine className="w-3.5 h-3.5" />
-        </button>
-      </span>
+      {side === "left" && (
+        <ActionButtons
+          lineNum={line.num}
+          hasThread={hasThread}
+          isOpen={isOpen}
+          onToggle={onToggle}
+          onOpen={onOpen}
+        />
+      )}
     </div>
   );
 });

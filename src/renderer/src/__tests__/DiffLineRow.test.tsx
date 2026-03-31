@@ -5,9 +5,11 @@ import type { DiffLine } from "../types";
 
 describe("DiffLineRow", () => {
   const onToggle = vi.fn();
+  const onOpen = vi.fn();
 
   afterEach(() => {
     onToggle.mockClear();
+    onOpen.mockClear();
   });
 
   it("renders placeholder as empty row", () => {
@@ -15,12 +17,13 @@ describe("DiffLineRow", () => {
     const { container } = render(
       <DiffLineRow
         line={line}
+        side="left"
         hasThread={false}
         isOpen={false}
         onToggle={onToggle}
+        onOpen={onOpen}
       />,
     );
-    // Placeholder should not show line number or add button
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
     expect(container.textContent?.trim()).toBe("");
   });
@@ -30,9 +33,11 @@ describe("DiffLineRow", () => {
     const { container } = render(
       <DiffLineRow
         line={line}
+        side="left"
         hasThread={false}
         isOpen={false}
         onToggle={onToggle}
+        onOpen={onOpen}
       />,
     );
     expect(screen.getByText("5")).toBeInTheDocument();
@@ -45,9 +50,11 @@ describe("DiffLineRow", () => {
     const { container } = render(
       <DiffLineRow
         line={line}
+        side="left"
         hasThread={false}
         isOpen={false}
         onToggle={onToggle}
+        onOpen={onOpen}
       />,
     );
     expect(screen.getByText("old code")).toBeInTheDocument();
@@ -59,9 +66,11 @@ describe("DiffLineRow", () => {
     render(
       <DiffLineRow
         line={line}
+        side="left"
         hasThread={true}
         isOpen={false}
         onToggle={onToggle}
+        onOpen={onOpen}
       />,
     );
     expect(screen.getByTitle("View comments on line 1")).toBeInTheDocument();
@@ -72,9 +81,11 @@ describe("DiffLineRow", () => {
     render(
       <DiffLineRow
         line={line}
+        side="left"
         hasThread={true}
         isOpen={true}
         onToggle={onToggle}
+        onOpen={onOpen}
       />,
     );
     expect(
@@ -82,17 +93,20 @@ describe("DiffLineRow", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("calls onToggle when add comment button is clicked", () => {
+  it("calls onOpen when add comment button is clicked", () => {
     const line: DiffLine = { num: 7, content: "code", type: "unchanged" };
     render(
       <DiffLineRow
         line={line}
+        side="left"
         hasThread={false}
         isOpen={false}
         onToggle={onToggle}
+        onOpen={onOpen}
       />,
     );
     fireEvent.click(screen.getByTitle("Add comment on line 7"));
-    expect(onToggle).toHaveBeenCalledWith(7);
+    expect(onOpen).toHaveBeenCalledWith(7);
+    expect(onToggle).not.toHaveBeenCalled();
   });
 });

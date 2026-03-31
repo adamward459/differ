@@ -5,10 +5,12 @@ import type { Comment } from "../types";
 
 describe("CommentThread", () => {
   const onAdd = vi.fn();
+  const onDelete = vi.fn();
   const onClose = vi.fn();
 
   afterEach(() => {
     onAdd.mockClear();
+    onDelete.mockClear();
     onClose.mockClear();
   });
 
@@ -22,6 +24,7 @@ describe("CommentThread", () => {
         comments={comments}
         outdated={false}
         onAdd={onAdd}
+        onDelete={onDelete}
         onClose={onClose}
       />,
     );
@@ -35,6 +38,7 @@ describe("CommentThread", () => {
         comments={[]}
         outdated={true}
         onAdd={onAdd}
+        onDelete={onDelete}
         onClose={onClose}
       />,
     );
@@ -47,6 +51,7 @@ describe("CommentThread", () => {
         comments={[]}
         outdated={false}
         onAdd={onAdd}
+        onDelete={onDelete}
         onClose={onClose}
       />,
     );
@@ -59,6 +64,7 @@ describe("CommentThread", () => {
         comments={[]}
         outdated={false}
         onAdd={onAdd}
+        onDelete={onDelete}
         onClose={onClose}
       />,
     );
@@ -72,6 +78,7 @@ describe("CommentThread", () => {
         comments={[]}
         outdated={false}
         onAdd={onAdd}
+        onDelete={onDelete}
         onClose={onClose}
       />,
     );
@@ -87,6 +94,7 @@ describe("CommentThread", () => {
         comments={[]}
         outdated={false}
         onAdd={onAdd}
+        onDelete={onDelete}
         onClose={onClose}
       />,
     );
@@ -100,6 +108,7 @@ describe("CommentThread", () => {
         comments={[]}
         outdated={false}
         onAdd={onAdd}
+        onDelete={onDelete}
         onClose={onClose}
       />,
     );
@@ -117,6 +126,7 @@ describe("CommentThread", () => {
         comments={[]}
         outdated={false}
         onAdd={onAdd}
+        onDelete={onDelete}
         onClose={onClose}
       />,
     );
@@ -130,6 +140,7 @@ describe("CommentThread", () => {
         comments={[]}
         outdated={false}
         onAdd={onAdd}
+        onDelete={onDelete}
         onClose={onClose}
       />,
     );
@@ -144,6 +155,7 @@ describe("CommentThread", () => {
         comments={[]}
         outdated={false}
         onAdd={onAdd}
+        onDelete={onDelete}
         onClose={onClose}
       />,
     );
@@ -151,5 +163,22 @@ describe("CommentThread", () => {
     fireEvent.change(textarea, { target: { value: "cmd enter" } });
     fireEvent.keyDown(textarea, { key: "Enter", metaKey: true });
     expect(onAdd).toHaveBeenCalledWith("cmd enter");
+  });
+
+  it("calls onDelete when delete button is clicked", () => {
+    const comments: Comment[] = [
+      { id: "abc", body: "to be deleted", createdAt: 1000 },
+    ];
+    render(
+      <CommentThread
+        comments={comments}
+        outdated={false}
+        onAdd={onAdd}
+        onDelete={onDelete}
+        onClose={onClose}
+      />,
+    );
+    fireEvent.click(screen.getByTitle("Delete comment"));
+    expect(onDelete).toHaveBeenCalledWith("abc");
   });
 });

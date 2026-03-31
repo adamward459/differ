@@ -63,6 +63,7 @@ function App(): React.JSX.Element {
           leftThreads={threadState.leftThreads}
           rightThreads={threadState.rightThreads}
           onAddComment={threadState.handleAddComment}
+          onDeleteComment={threadState.handleDeleteComment}
           threads={threadState.threads}
         />
       )}

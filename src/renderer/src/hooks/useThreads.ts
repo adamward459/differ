@@ -84,6 +84,26 @@ export function useThreads(
     [activeFile, leftLines, rightLines],
   );
 
+  const handleDeleteComment = useCallback(
+    (side: DiffSide, line: number, commentId: string) => {
+      if (!activeFile) return;
+      setThreads(prev => {
+        const idx = prev.findIndex(
+          t => t.file === activeFile && t.side === side && t.line === line,
+        );
+        if (idx < 0) return prev;
+        const remaining = prev[idx].comments.filter(c => c.id !== commentId);
+        if (remaining.length === 0) {
+          return prev.filter((_, i) => i !== idx);
+        }
+        const updated = [...prev];
+        updated[idx] = { ...updated[idx], comments: remaining };
+        return updated;
+      });
+    },
+    [activeFile],
+  );
+
   const refreshOutdated = useCallback(
     (file: string, left: DiffLine[], right: DiffLine[]) => {
       setThreads(prev => markOutdatedThreads(prev, file, left, right));
@@ -106,6 +126,7 @@ export function useThreads(
     leftThreads,
     rightThreads,
     handleAddComment,
+    handleDeleteComment,
     refreshOutdated,
   };
 }

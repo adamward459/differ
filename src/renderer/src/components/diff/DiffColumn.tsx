@@ -9,6 +9,7 @@ const DiffColumn = memo(function DiffColumn({
   side,
   threads,
   onAddComment,
+  onDeleteComment,
   scrollRef,
   onScroll,
 }: {
@@ -17,6 +18,7 @@ const DiffColumn = memo(function DiffColumn({
   side: DiffSide;
   threads: ThreadMap;
   onAddComment: (side: DiffSide, line: number, body: string) => void;
+  onDeleteComment: (side: DiffSide, line: number, commentId: string) => void;
   scrollRef: RefObject<HTMLDivElement | null>;
   onScroll: (source: DiffSide) => void;
 }) {
@@ -29,12 +31,23 @@ const DiffColumn = memo(function DiffColumn({
     [side, onAddComment],
   );
 
+  const handleDelete = useCallback(
+    (line: number, commentId: string) => {
+      onDeleteComment(side, line, commentId);
+    },
+    [side, onDeleteComment],
+  );
+
   const handleClose = useCallback(() => setOpenLine(null), []);
 
   const handleScroll = useCallback(() => onScroll(side), [side, onScroll]);
 
   const handleToggle = useCallback((lineNum: number) => {
     setOpenLine(prev => (prev === lineNum ? null : lineNum));
+  }, []);
+
+  const handleOpen = useCallback((lineNum: number) => {
+    setOpenLine(lineNum);
   }, []);
 
   return (
@@ -61,15 +74,18 @@ const DiffColumn = memo(function DiffColumn({
             <div key={key}>
               <DiffLineRow
                 line={line}
+                side={side}
                 hasThread={hasThread}
                 isOpen={isOpen}
                 onToggle={handleToggle}
+                onOpen={handleOpen}
               />
               {isOpen && line.type !== "placeholder" && (
                 <CommentThread
                   comments={threads[line.num]?.comments ?? []}
                   outdated={threads[line.num]?.outdated ?? false}
                   onAdd={body => handleAdd(line.num, body)}
+                  onDelete={commentId => handleDelete(line.num, commentId)}
                   onClose={handleClose}
                 />
               )}

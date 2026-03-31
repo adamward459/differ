@@ -22,6 +22,7 @@ const DiffPanel = memo(function DiffPanel({
   leftThreads,
   rightThreads,
   onAddComment,
+  onDeleteComment,
   threads,
 }: {
   leftLines: DiffLine[];
@@ -33,6 +34,7 @@ const DiffPanel = memo(function DiffPanel({
   leftThreads: ThreadMap;
   rightThreads: ThreadMap;
   onAddComment: (side: DiffSide, line: number, body: string) => void;
+  onDeleteComment: (side: DiffSide, line: number, commentId: string) => void;
   threads: CommentThread[];
 }) {
   const leftRef = useRef<HTMLDivElement>(null);
@@ -112,6 +114,7 @@ const DiffPanel = memo(function DiffPanel({
           side="left"
           threads={leftThreads}
           onAddComment={onAddComment}
+          onDeleteComment={onDeleteComment}
           scrollRef={leftRef}
           onScroll={handleScroll}
         />
@@ -122,6 +125,7 @@ const DiffPanel = memo(function DiffPanel({
           side="right"
           threads={rightThreads}
           onAddComment={onAddComment}
+          onDeleteComment={onDeleteComment}
           scrollRef={rightRef}
           onScroll={handleScroll}
         />

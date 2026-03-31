@@ -1,5 +1,6 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from "electron";
 import { join } from "path";
+import { watch, type FSWatcher } from "fs";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import simpleGit from "simple-git";
 
@@ -93,6 +94,66 @@ ipcMain.handle(
   },
 );
 
+// ── Repo watcher ──
+
+let activeWatchers: FSWatcher[] = [];
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+function stopWatching(): void {
+  for (const w of activeWatchers) w.close();
+  activeWatchers = [];
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+    debounceTimer = null;
+  }
+}
+
+function watchRepo(folderPath: string): void {
+  stopWatching();
+
+  const notify = (): void => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      debounceTimer = null;
+      for (const win of BrowserWindow.getAllWindows()) {
+        win.webContents.send("repo-changed");
+      }
+    }, 300);
+  };
+
+  // Watch .git dir (covers commits, branch switches, stash, etc.)
+  try {
+    activeWatchers.push(
+      watch(join(folderPath, ".git"), { recursive: true }, notify),
+    );
+  } catch {
+    // .git may not exist yet — that's fine
+  }
+
+  // Watch working tree (covers file edits, new files, deletes)
+  try {
+    activeWatchers.push(
+      watch(folderPath, { recursive: true }, (_event, filename) => {
+        // Skip .git internal churn — already covered above
+        if (filename && filename.startsWith(".git")) return;
+        // Skip node_modules noise
+        if (filename && filename.startsWith("node_modules")) return;
+        notify();
+      }),
+    );
+  } catch {
+    // non-critical
+  }
+}
+
+ipcMain.handle("watch-repo", (_event, folderPath: string) => {
+  watchRepo(folderPath);
+});
+
+ipcMain.handle("unwatch-repo", () => {
+  stopWatching();
+});
+
 // ── App lifecycle ──
 
 app.whenReady().then(() => {
@@ -110,5 +171,6 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
+  stopWatching();
   if (process.platform !== "darwin") app.quit();
 });

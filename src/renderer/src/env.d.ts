@@ -13,6 +13,9 @@ interface DifferAPI {
     raw?: string;
     error?: string;
   }>;
+  watchRepo(folderPath: string): Promise<void>;
+  unwatchRepo(): Promise<void>;
+  onRepoChanged(callback: () => void): () => void;
 }
 
 interface Window {

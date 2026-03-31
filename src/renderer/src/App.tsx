@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { RiFolderOpenLine } from "@remixicon/react";
 import Sidebar from "./components/Sidebar";
 import DiffPanel from "./components/DiffPanel";
@@ -43,6 +43,9 @@ function App(): React.JSX.Element {
       }),
     );
     setFiles(entries);
+
+    // Start watching the new folder
+    window.api.watchRepo(selected);
   }, []);
 
   const handleSelectFile = useCallback(
@@ -64,6 +67,63 @@ function App(): React.JSX.Element {
     },
     [folderPath],
   );
+
+  // Keep refs in sync for the watcher callback
+  const folderRef = useRef(folderPath);
+  const activeFileRef = useRef(activeFile);
+  folderRef.current = folderPath;
+  activeFileRef.current = activeFile;
+
+  // Subscribe to file system changes and refresh
+  useEffect(() => {
+    const unsubscribe = window.api.onRepoChanged(async () => {
+      const fp = folderRef.current;
+      if (!fp) return;
+
+      // Refresh file list
+      const result = await window.api.getChangedFiles(fp);
+      if (result.error) return;
+
+      const entries: FileEntry[] = (result.files ?? []).map(
+        (f: { name: string; status: string }) => ({
+          name: f.name,
+          additions: 0,
+          deletions: 0,
+          status: f.status as FileEntry["status"],
+        }),
+      );
+      setFiles(entries);
+
+      // Refresh active diff if still in the list
+      const af = activeFileRef.current;
+      if (af) {
+        const stillExists = entries.some(e => e.name === af);
+        if (stillExists) {
+          const diffResult = await window.api.getFileDiff(fp, af);
+          if (!diffResult.error) {
+            if (diffResult.raw) {
+              const { left, right } = parseDiff(diffResult.raw);
+              setLeftLines(left);
+              setRightLines(right);
+            } else {
+              setLeftLines((diffResult.leftLines as DiffLine[]) ?? []);
+              setRightLines((diffResult.rightLines as DiffLine[]) ?? []);
+            }
+          }
+        } else {
+          // File no longer changed — clear diff
+          setActiveFile(null);
+          setLeftLines([]);
+          setRightLines([]);
+        }
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      window.api.unwatchRepo();
+    };
+  }, []);
 
   // No folder selected — show landing
   if (!folderPath) {

@@ -43,6 +43,11 @@
   /* Active item */
   --color-item-active: var(--item-active);
   --color-item-hover: var(--item-hover);
+
+  /* Comments */
+  --color-comment-bg: var(--comment-bg);
+  --color-comment-border: var(--comment-border);
+  --color-comment-input-bg: var(--comment-input-bg);
 }
 
 /* ── Light theme (default) ── */
@@ -74,6 +79,10 @@
 
   --item-active: oklch(0.92 0 0);
   --item-hover: oklch(0.95 0 0);
+
+  --comment-bg: oklch(0.96 0.02 250);
+  --comment-border: oklch(0.85 0.03 250);
+  --comment-input-bg: oklch(0.99 0 0);
 
   color-scheme: light dark;
 }
@@ -108,6 +117,10 @@
 
     --item-active: oklch(0.26 0 0 / 0.6);
     --item-hover: oklch(0.22 0 0);
+
+    --comment-bg: oklch(0.2 0.02 250);
+    --comment-border: oklch(0.3 0.03 250);
+    --comment-input-bg: oklch(0.16 0 0);
   }
 }
 

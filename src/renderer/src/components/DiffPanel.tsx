@@ -1,6 +1,10 @@
 import { memo } from "react";
 import DiffColumn from "./DiffColumn";
-import type { DiffLine } from "../types";
+import type { DiffLine, DiffSide, Comment } from "../types";
+
+interface ThreadMap {
+  [line: number]: Comment[];
+}
 
 const DiffPanel = memo(function DiffPanel({
   leftLines,
@@ -8,12 +12,18 @@ const DiffPanel = memo(function DiffPanel({
   fileName,
   additions,
   deletions,
+  leftThreads,
+  rightThreads,
+  onAddComment,
 }: {
   leftLines: DiffLine[];
   rightLines: DiffLine[];
   fileName: string;
   additions: number;
   deletions: number;
+  leftThreads: ThreadMap;
+  rightThreads: ThreadMap;
+  onAddComment: (side: DiffSide, line: number, body: string) => void;
 }) {
   return (
     <main className="flex-1 flex flex-col min-w-0">
@@ -34,9 +44,21 @@ const DiffPanel = memo(function DiffPanel({
       </div>
 
       <div className="flex-1 flex min-h-0">
-        <DiffColumn lines={leftLines} label={`a/${fileName}`} />
+        <DiffColumn
+          lines={leftLines}
+          label={`a/${fileName}`}
+          side="left"
+          threads={leftThreads}
+          onAddComment={onAddComment}
+        />
         <div className="w-px bg-border shrink-0" />
-        <DiffColumn lines={rightLines} label={`b/${fileName}`} />
+        <DiffColumn
+          lines={rightLines}
+          label={`b/${fileName}`}
+          side="right"
+          threads={rightThreads}
+          onAddComment={onAddComment}
+        />
       </div>
     </main>
   );

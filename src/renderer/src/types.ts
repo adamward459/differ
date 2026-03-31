@@ -12,3 +12,18 @@ export interface FileEntry {
   deletions: number;
   status?: "modified" | "added" | "untracked" | "deleted" | "renamed";
 }
+
+export type DiffSide = "left" | "right";
+
+export interface Comment {
+  id: string;
+  body: string;
+  createdAt: number;
+}
+
+export interface CommentThread {
+  file: string;
+  side: DiffSide;
+  line: number;
+  comments: Comment[];
+}

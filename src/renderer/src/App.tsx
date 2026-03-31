@@ -1,8 +1,8 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { RiFolderOpenLine } from "@remixicon/react";
 import Sidebar from "./components/Sidebar";
 import DiffPanel from "./components/DiffPanel";
-import type { FileEntry, DiffLine } from "./types";
+import type { FileEntry, DiffLine, DiffSide, CommentThread } from "./types";
 import { parseDiff } from "./utils/parseDiff";
 
 function App(): React.JSX.Element {
@@ -13,6 +13,51 @@ function App(): React.JSX.Element {
   const [rightLines, setRightLines] = useState<DiffLine[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [threads, setThreads] = useState<CommentThread[]>([]);
+
+  const handleAddComment = useCallback(
+    (side: DiffSide, line: number, body: string) => {
+      if (!activeFile) return;
+      setThreads(prev => {
+        const idx = prev.findIndex(
+          t => t.file === activeFile && t.side === side && t.line === line,
+        );
+        const comment = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          body,
+          createdAt: Date.now(),
+        };
+        if (idx >= 0) {
+          const updated = [...prev];
+          updated[idx] = {
+            ...updated[idx],
+            comments: [...updated[idx].comments, comment],
+          };
+          return updated;
+        }
+        return [...prev, { file: activeFile, side, line, comments: [comment] }];
+      });
+    },
+    [activeFile],
+  );
+
+  const leftThreads = useMemo(() => {
+    const map: Record<number, CommentThread["comments"]> = {};
+    if (!activeFile) return map;
+    for (const t of threads) {
+      if (t.file === activeFile && t.side === "left") map[t.line] = t.comments;
+    }
+    return map;
+  }, [threads, activeFile]);
+
+  const rightThreads = useMemo(() => {
+    const map: Record<number, CommentThread["comments"]> = {};
+    if (!activeFile) return map;
+    for (const t of threads) {
+      if (t.file === activeFile && t.side === "right") map[t.line] = t.comments;
+    }
+    return map;
+  }, [threads, activeFile]);
 
   const handleOpenFolder = useCallback(async () => {
     const selected = await window.api.openFolder();
@@ -168,6 +213,9 @@ function App(): React.JSX.Element {
           fileName={activeFile}
           additions={rightLines.filter(l => l.type === "added").length}
           deletions={leftLines.filter(l => l.type === "removed").length}
+          leftThreads={leftThreads}
+          rightThreads={rightThreads}
+          onAddComment={handleAddComment}
         />
       )}
 

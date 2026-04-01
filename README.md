@@ -144,6 +144,18 @@ src/
 
 Comments are stored in-memory per session. Each thread tracks the line content at creation time. When the diff refreshes, `markOutdatedThreads` compares current line content against the snapshot — if it changed, the thread is flagged as outdated with a visual indicator.
 
+## macOS Troubleshooting
+
+### "Differ.app contains malware" on macOS 26 Tahoe
+
+macOS 26 Tahoe tightened Gatekeeper restrictions. Unsigned apps are blocked with a malware warning, and the old right-click → "Open" workaround no longer works. Remove the quarantine flag to fix it:
+
+```bash
+xattr -r -d com.apple.quarantine /Applications/Differ.app
+```
+
+> This is not required on macOS 15 Sequoia or earlier.
+
 ## CI/CD
 
 A GitHub Actions workflow (`.github/workflows/release.yml`) builds and publishes releases:

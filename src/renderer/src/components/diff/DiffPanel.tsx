@@ -1,9 +1,10 @@
-import { memo, useRef, useCallback, useMemo, useState } from 'react';
+import { memo, useRef, useCallback, useMemo } from 'react';
 import { RiFileCopyLine, RiCheckLine } from '@remixicon/react';
 import DiffColumn from './DiffColumn';
 import StatusBadge from '../common/StatusBadge';
 import DiffStats from '../common/DiffStats';
 import Button from '../common/Button';
+import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import type {
   DiffLine,
   DiffSide,
@@ -24,6 +25,7 @@ const DiffPanel = memo(function DiffPanel({
   onAddComment,
   onDeleteComment,
   threads,
+  totalCommentCount,
 }: {
   leftLines: DiffLine[];
   rightLines: DiffLine[];
@@ -36,6 +38,7 @@ const DiffPanel = memo(function DiffPanel({
   onAddComment: (side: DiffSide, line: number, body: string) => void;
   onDeleteComment: (side: DiffSide, line: number, commentId: string) => void;
   threads: CommentThread[];
+  totalCommentCount: number;
 }) {
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
@@ -46,24 +49,27 @@ const DiffPanel = memo(function DiffPanel({
     [threads],
   );
 
-  const [copied, setCopied] = useState(false);
-  const copyTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
-    undefined,
-  );
+  const { isCopied, copy } = useCopyToClipboard();
 
   const handleCopyComments = useCallback(() => {
+    if (activeNonOutdatedThreads.length === 0) return;
     const parts: string[] = [];
     for (const t of activeNonOutdatedThreads) {
       for (const c of t.comments) {
         parts.push(`${t.file}#${t.line}\n${c.body}`);
       }
     }
-    if (parts.length === 0) return;
-    navigator.clipboard.writeText(parts.join('\n-----\n'));
-    setCopied(true);
-    clearTimeout(copyTimer.current);
-    copyTimer.current = setTimeout(() => setCopied(false), 1500);
-  }, [activeNonOutdatedThreads]);
+    const comments = parts.join('\n-----\n');
+    const prompt = [
+      'You are a code reviewer. The user has left review comments on a diff.',
+      'Address each comment by suggesting concrete code changes or explanations.',
+      '',
+      `Total comments: ${totalCommentCount}`,
+      '',
+      comments,
+    ].join('\n');
+    copy(prompt);
+  }, [activeNonOutdatedThreads, totalCommentCount, copy]);
 
   const handleScroll = useCallback((source: DiffSide) => {
     if (syncing.current) return;
@@ -89,15 +95,15 @@ const DiffPanel = memo(function DiffPanel({
         <div className="flex items-center gap-2 text-[12px] font-mono">
           {activeNonOutdatedThreads.length > 0 && (
             <Button
-              icon={copied ? RiCheckLine : RiFileCopyLine}
-              variant={copied ? 'accent' : 'ghost'}
+              icon={isCopied ? RiCheckLine : RiFileCopyLine}
+              variant={isCopied ? 'accent' : 'ghost'}
               size="sm"
               onClick={handleCopyComments}
               aria-label="Copy all comments"
-              title="Copy all comments (excludes outdated)"
-              className={copied ? 'text-diff-add' : ''}
+              title="Copy all comments as AI review prompt (excludes outdated)"
+              className={isCopied ? 'text-diff-add' : ''}
             >
-              {copied ? 'Copied' : 'Copy comments'}
+              {isCopied ? 'Copied' : `Copy comments (${totalCommentCount})`}
             </Button>
           )}
           <DiffStats additions={additions} deletions={deletions} />
@@ -106,6 +112,7 @@ const DiffPanel = memo(function DiffPanel({
 
       <div className="flex-1 flex min-h-0">
         <DiffColumn
+          key={`left-${fileName}`}
           lines={leftLines}
           label={`a/${fileName}`}
           side="left"
@@ -117,6 +124,7 @@ const DiffPanel = memo(function DiffPanel({
         />
         <div className="w-px bg-border shrink-0" />
         <DiffColumn
+          key={`right-${fileName}`}
           lines={rightLines}
           label={`b/${fileName}`}
           side="right"

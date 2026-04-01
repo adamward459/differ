@@ -1,35 +1,37 @@
-import { memo, useCallback, useRef } from "react";
-import { RiFolderOpenLine } from "@remixicon/react";
-import FileItem from "./FileItem";
-import IconButton from "../common/IconButton";
-import type { FileEntry } from "../../types";
-import logoSrc from "../../assets/Logo.png";
-import { useStartup } from "../../hooks/useStartup";
+import { memo, useCallback, useRef } from 'react';
+import { RiFolderOpenLine } from '@remixicon/react';
+import FileItem from './FileItem';
+import IconButton from '../common/IconButton';
+import type { FileEntry } from '../../types';
+import logoSrc from '../../assets/Logo.png';
+import { useStartup } from '../../hooks/useStartup';
 
 const Sidebar = memo(function Sidebar({
   files,
   activeFile,
   onSelectFile,
   onOpenFolder,
+  commentCountByFile,
 }: {
   files: FileEntry[];
   activeFile: string | null;
   onSelectFile: (name: string) => void;
   onOpenFolder: () => void;
+  commentCountByFile: Record<string, number>;
 }) {
   const navRef = useRef<HTMLElement>(null);
   const { openAtLogin, toggleOpenAtLogin } = useStartup();
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLElement>) => {
-      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
       e.preventDefault();
 
       const nav = navRef.current;
       if (!nav) return;
 
       const items = Array.from(
-        nav.querySelectorAll<HTMLButtonElement>("[data-file-item]"),
+        nav.querySelectorAll<HTMLButtonElement>('[data-file-item]'),
       );
       if (items.length === 0) return;
 
@@ -37,7 +39,7 @@ const Sidebar = memo(function Sidebar({
       const idx = items.indexOf(current as HTMLButtonElement);
       let next: number;
 
-      if (e.key === "ArrowDown") {
+      if (e.key === 'ArrowDown') {
         next = idx < items.length - 1 ? idx + 1 : 0;
       } else {
         next = idx > 0 ? idx - 1 : items.length - 1;
@@ -72,7 +74,7 @@ const Sidebar = memo(function Sidebar({
           />
         </div>
         <div className="text-[11px] font-medium uppercase tracking-widest text-text-muted">
-          {files.length} changed {files.length === 1 ? "file" : "files"}
+          {files.length} changed {files.length === 1 ? 'file' : 'files'}
         </div>
       </div>
 
@@ -91,6 +93,7 @@ const Sidebar = memo(function Sidebar({
             deletions={file.deletions}
             status={file.status}
             active={file.name === activeFile}
+            commentCount={commentCountByFile[file.name]}
             onClick={() => onSelectFile(file.name)}
           />
         ))}

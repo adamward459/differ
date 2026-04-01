@@ -120,6 +120,24 @@ export function useThreads(
     [threads, activeFile],
   );
 
+  const allActiveThreads = useMemo(
+    () => threads.filter(t => !t.outdated && t.comments.length > 0),
+    [threads],
+  );
+
+  const totalCommentCount = useMemo(
+    () => allActiveThreads.reduce((sum, t) => sum + t.comments.length, 0),
+    [allActiveThreads],
+  );
+
+  const commentCountByFile = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const t of allActiveThreads) {
+      map[t.file] = (map[t.file] ?? 0) + t.comments.length;
+    }
+    return map;
+  }, [allActiveThreads]);
+
   return {
     threads,
     leftThreads,
@@ -127,5 +145,7 @@ export function useThreads(
     handleAddComment,
     handleDeleteComment,
     refreshOutdated,
+    totalCommentCount,
+    commentCountByFile,
   };
 }

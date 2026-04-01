@@ -41,6 +41,7 @@ function App(): React.JSX.Element {
         activeFile={repo.activeFile}
         onSelectFile={repo.handleSelectFile}
         onOpenFolder={repo.handleOpenFolder}
+        commentCountByFile={threadState.commentCountByFile}
       />
 
       {repo.loading && (
@@ -64,6 +65,7 @@ function App(): React.JSX.Element {
           onAddComment={threadState.handleAddComment}
           onDeleteComment={threadState.handleDeleteComment}
           threads={threadState.threads}
+          totalCommentCount={threadState.totalCommentCount}
         />
       )}
 

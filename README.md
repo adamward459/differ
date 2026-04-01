@@ -148,11 +148,34 @@ Comments are stored in-memory per session. Each thread tracks the line content a
 
 ### "Differ.app contains malware" on macOS 26 Tahoe
 
-macOS 26 Tahoe tightened Gatekeeper restrictions. Unsigned apps are blocked with a malware warning, and the old right-click → "Open" workaround no longer works. Remove the quarantine flag to fix it:
+macOS 26 Tahoe tightened Gatekeeper restrictions. Unsigned apps are blocked with a malware warning, and the old right-click → "Open" workaround no longer works.
+
+#### For locally built apps (`dist/mac-arm64/Differ.app`):
+
+```bash
+# Remove quarantine flag and clear Gatekeeper cache
+sudo xattr -cr dist/mac-arm64/Differ.app
+sudo spctl --remove dist/mac-arm64/Differ.app
+sudo spctl --add --label "Differ" dist/mac-arm64/Differ.app
+```
+
+#### For installed apps (`/Applications/Differ.app`):
 
 ```bash
 xattr -r -d com.apple.quarantine /Applications/Differ.app
 ```
+
+#### If issues persist:
+
+Temporarily disable Gatekeeper (not recommended for production):
+
+```bash
+sudo spctl --master-disable
+# Open the app, then re-enable:
+sudo spctl --master-enable
+```
+
+**Permanent solution:** The build configuration now includes ad-hoc signing (`"identity": null`) to improve compatibility with macOS 26 Tahoe. Rebuild the app after pulling the latest changes.
 
 > This is not required on macOS 15 Sequoia or earlier.
 

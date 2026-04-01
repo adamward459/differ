@@ -39,11 +39,8 @@ describe('FileItem', () => {
     expect(screen.getByRole('option')).toHaveAttribute('aria-selected', 'true')
   })
 
-  it('sets tabIndex 0 when active, -1 when not', () => {
-    const { rerender } = render(<FileItem name="f.ts" additions={0} deletions={0} active={true} />)
-    expect(screen.getByRole('option')).toHaveAttribute('tabindex', '0')
-
-    rerender(<FileItem name="f.ts" additions={0} deletions={0} active={false} />)
-    expect(screen.getByRole('option')).toHaveAttribute('tabindex', '-1')
+  it('does not set tabIndex attribute', () => {
+    render(<FileItem name="f.ts" additions={0} deletions={0} active={true} />)
+    expect(screen.getByRole('option')).not.toHaveAttribute('tabindex')
   })
 })

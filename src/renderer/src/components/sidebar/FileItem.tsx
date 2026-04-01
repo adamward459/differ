@@ -26,7 +26,6 @@ const FileItem = memo(function FileItem({
       data-file-item
       role="option"
       aria-selected={active}
-      tabIndex={active ? 0 : -1}
       onClick={onClick}
       className={`w-full text-left px-3 py-2 rounded-lg transition-all duration-150 group ${
         active

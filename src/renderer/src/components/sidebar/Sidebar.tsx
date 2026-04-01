@@ -1,7 +1,8 @@
-import { memo, useCallback, useRef } from 'react'
+import { memo, useCallback, useMemo, useRef, useState } from 'react'
 import { RiFolderOpenLine } from '@remixicon/react'
 import FileItem from './FileItem'
 import IconButton from '../common/IconButton'
+import SearchInput from '../common/SearchInput'
 import type { FileEntry } from '../../types'
 import logoSrc from '../../assets/Logo.png'
 import { useStartup } from '../../hooks/useStartup'
@@ -20,7 +21,14 @@ const Sidebar = memo(function Sidebar({
   commentCountByFile: Record<string, number>
 }) {
   const navRef = useRef<HTMLElement>(null)
+  const [query, setQuery] = useState('')
   const { openAtLogin, toggleOpenAtLogin } = useStartup()
+
+  const filteredFiles = useMemo(() => {
+    if (!query) return files
+    const lower = query.toLowerCase()
+    return files.filter((f) => f.name.toLowerCase().includes(lower))
+  }, [files, query])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLElement>) => {
@@ -44,9 +52,9 @@ const Sidebar = memo(function Sidebar({
       }
 
       items[next].focus()
-      onSelectFile(files[next].name)
+      onSelectFile(filteredFiles[next].name)
     },
-    [files, onSelectFile]
+    [filteredFiles, onSelectFile]
   )
 
   return (
@@ -68,6 +76,14 @@ const Sidebar = memo(function Sidebar({
         <div className="text-[11px] font-medium uppercase tracking-widest text-text-muted">
           {files.length} changed {files.length === 1 ? 'file' : 'files'}
         </div>
+        <div className="mt-3">
+          <SearchInput
+            value={query}
+            onChange={setQuery}
+            placeholder="Search files…"
+            aria-label="Search changed files"
+          />
+        </div>
       </div>
 
       <nav
@@ -77,7 +93,7 @@ const Sidebar = memo(function Sidebar({
         onKeyDown={handleKeyDown}
         className="flex-1 overflow-y-auto p-2 space-y-0.5"
       >
-        {files.map((file) => (
+        {filteredFiles.map((file) => (
           <FileItem
             key={file.name}
             name={file.name}

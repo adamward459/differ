@@ -1,16 +1,16 @@
-import { memo, useRef, useCallback, useMemo, useState } from "react";
-import { RiFileCopyLine, RiCheckLine } from "@remixicon/react";
-import DiffColumn from "./DiffColumn";
-import StatusBadge from "../common/StatusBadge";
-import DiffStats from "../common/DiffStats";
-import Button from "../common/Button";
+import { memo, useRef, useCallback, useMemo, useState } from 'react';
+import { RiFileCopyLine, RiCheckLine } from '@remixicon/react';
+import DiffColumn from './DiffColumn';
+import StatusBadge from '../common/StatusBadge';
+import DiffStats from '../common/DiffStats';
+import Button from '../common/Button';
 import type {
   DiffLine,
   DiffSide,
   CommentThread,
   ThreadMap,
   FileEntry,
-} from "../../types";
+} from '../../types';
 
 const DiffPanel = memo(function DiffPanel({
   leftLines,
@@ -30,7 +30,7 @@ const DiffPanel = memo(function DiffPanel({
   fileName: string;
   additions: number;
   deletions: number;
-  status?: FileEntry["status"];
+  status?: FileEntry['status'];
   leftThreads: ThreadMap;
   rightThreads: ThreadMap;
   onAddComment: (side: DiffSide, line: number, body: string) => void;
@@ -59,7 +59,7 @@ const DiffPanel = memo(function DiffPanel({
       }
     }
     if (parts.length === 0) return;
-    navigator.clipboard.writeText(parts.join("\n-----\n"));
+    navigator.clipboard.writeText(parts.join('\n-----\n'));
     setCopied(true);
     clearTimeout(copyTimer.current);
     copyTimer.current = setTimeout(() => setCopied(false), 1500);
@@ -68,8 +68,8 @@ const DiffPanel = memo(function DiffPanel({
   const handleScroll = useCallback((source: DiffSide) => {
     if (syncing.current) return;
     syncing.current = true;
-    const from = source === "left" ? leftRef.current : rightRef.current;
-    const to = source === "left" ? rightRef.current : leftRef.current;
+    const from = source === 'left' ? leftRef.current : rightRef.current;
+    const to = source === 'left' ? rightRef.current : leftRef.current;
     if (from && to) {
       to.scrollTop = from.scrollTop;
       to.scrollLeft = from.scrollLeft;
@@ -90,14 +90,14 @@ const DiffPanel = memo(function DiffPanel({
           {activeNonOutdatedThreads.length > 0 && (
             <Button
               icon={copied ? RiCheckLine : RiFileCopyLine}
-              variant={copied ? "accent" : "ghost"}
+              variant={copied ? 'accent' : 'ghost'}
               size="sm"
               onClick={handleCopyComments}
               aria-label="Copy all comments"
               title="Copy all comments (excludes outdated)"
-              className={copied ? "text-diff-add" : ""}
+              className={copied ? 'text-diff-add' : ''}
             >
-              {copied ? "Copied" : "Copy comments"}
+              {copied ? 'Copied' : 'Copy comments'}
             </Button>
           )}
           <DiffStats additions={additions} deletions={deletions} />

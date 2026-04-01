@@ -1,13 +1,13 @@
-import { memo } from "react";
+import { memo } from 'react'
 
 const DiffStats = memo(function DiffStats({
   additions,
-  deletions,
+  deletions
 }: {
-  additions: number;
-  deletions: number;
+  additions: number
+  deletions: number
 }) {
-  if (additions === 0 && deletions === 0) return null;
+  if (additions === 0 && deletions === 0) return null
 
   return (
     <div className="flex items-center gap-2 text-[12px] font-mono">
@@ -22,7 +22,7 @@ const DiffStats = memo(function DiffStats({
         </span>
       )}
     </div>
-  );
-});
+  )
+})
 
-export default DiffStats;
+export default DiffStats

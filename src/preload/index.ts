@@ -1,47 +1,45 @@
-import { contextBridge, ipcRenderer } from "electron";
-import { electronAPI } from "@electron-toolkit/preload";
+import { contextBridge, ipcRenderer } from 'electron'
+import { electronAPI } from '@electron-toolkit/preload'
 
 const api = {
-  getOpenAtLogin: (): Promise<boolean> =>
-    ipcRenderer.invoke("get-open-at-login"),
+  getOpenAtLogin: (): Promise<boolean> => ipcRenderer.invoke('get-open-at-login'),
   setOpenAtLogin: (enabled: boolean): Promise<void> =>
-    ipcRenderer.invoke("set-open-at-login", enabled),
-  openFolder: (): Promise<string | null> => ipcRenderer.invoke("open-folder"),
+    ipcRenderer.invoke('set-open-at-login', enabled),
+  openFolder: (): Promise<string | null> => ipcRenderer.invoke('open-folder'),
   getChangedFiles: (
-    folderPath: string,
+    folderPath: string
   ): Promise<{
-    files?: { name: string; status: string }[];
-    error?: string;
-  }> => ipcRenderer.invoke("get-changed-files", folderPath),
+    files?: { name: string; status: string }[]
+    error?: string
+  }> => ipcRenderer.invoke('get-changed-files', folderPath),
   getFileDiff: (
     folderPath: string,
-    filePath: string,
+    filePath: string
   ): Promise<{
-    leftLines?: { num: number; content: string; type: string }[];
-    rightLines?: { num: number; content: string; type: string }[];
-    raw?: string;
-    error?: string;
-  }> => ipcRenderer.invoke("get-file-diff", folderPath, filePath),
-  watchRepo: (folderPath: string): Promise<void> =>
-    ipcRenderer.invoke("watch-repo", folderPath),
-  unwatchRepo: (): Promise<void> => ipcRenderer.invoke("unwatch-repo"),
+    leftLines?: { num: number; content: string; type: string }[]
+    rightLines?: { num: number; content: string; type: string }[]
+    raw?: string
+    error?: string
+  }> => ipcRenderer.invoke('get-file-diff', folderPath, filePath),
+  watchRepo: (folderPath: string): Promise<void> => ipcRenderer.invoke('watch-repo', folderPath),
+  unwatchRepo: (): Promise<void> => ipcRenderer.invoke('unwatch-repo'),
   onRepoChanged: (callback: () => void): (() => void) => {
-    const handler = (): void => callback();
-    ipcRenderer.on("repo-changed", handler);
-    return () => ipcRenderer.removeListener("repo-changed", handler);
-  },
-};
+    const handler = (): void => callback()
+    ipcRenderer.on('repo-changed', handler)
+    return () => ipcRenderer.removeListener('repo-changed', handler)
+  }
+}
 
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld("electron", electronAPI);
-    contextBridge.exposeInMainWorld("api", api);
+    contextBridge.exposeInMainWorld('electron', electronAPI)
+    contextBridge.exposeInMainWorld('api', api)
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
 } else {
   // @ts-ignore
-  window.electron = electronAPI;
+  window.electron = electronAPI
   // @ts-ignore
-  window.api = api;
+  window.api = api
 }

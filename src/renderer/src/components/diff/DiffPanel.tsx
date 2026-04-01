@@ -1,17 +1,11 @@
-import { memo, useRef, useCallback, useMemo } from 'react';
-import { RiFileCopyLine, RiCheckLine } from '@remixicon/react';
-import DiffColumn from './DiffColumn';
-import StatusBadge from '../common/StatusBadge';
-import DiffStats from '../common/DiffStats';
-import Button from '../common/Button';
-import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
-import type {
-  DiffLine,
-  DiffSide,
-  CommentThread,
-  ThreadMap,
-  FileEntry,
-} from '../../types';
+import { memo, useRef, useCallback, useMemo } from 'react'
+import { RiFileCopyLine, RiCheckLine } from '@remixicon/react'
+import DiffColumn from './DiffColumn'
+import StatusBadge from '../common/StatusBadge'
+import DiffStats from '../common/DiffStats'
+import Button from '../common/Button'
+import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
+import type { DiffLine, DiffSide, CommentThread, ThreadMap, FileEntry } from '../../types'
 
 const DiffPanel = memo(function DiffPanel({
   leftLines,
@@ -25,71 +19,69 @@ const DiffPanel = memo(function DiffPanel({
   onAddComment,
   onDeleteComment,
   threads,
-  totalCommentCount,
+  totalCommentCount
 }: {
-  leftLines: DiffLine[];
-  rightLines: DiffLine[];
-  fileName: string;
-  additions: number;
-  deletions: number;
-  status?: FileEntry['status'];
-  leftThreads: ThreadMap;
-  rightThreads: ThreadMap;
-  onAddComment: (side: DiffSide, line: number, body: string) => void;
-  onDeleteComment: (side: DiffSide, line: number, commentId: string) => void;
-  threads: CommentThread[];
-  totalCommentCount: number;
+  leftLines: DiffLine[]
+  rightLines: DiffLine[]
+  fileName: string
+  additions: number
+  deletions: number
+  status?: FileEntry['status']
+  leftThreads: ThreadMap
+  rightThreads: ThreadMap
+  onAddComment: (side: DiffSide, line: number, body: string) => void
+  onDeleteComment: (side: DiffSide, line: number, commentId: string) => void
+  threads: CommentThread[]
+  totalCommentCount: number
 }) {
-  const leftRef = useRef<HTMLDivElement>(null);
-  const rightRef = useRef<HTMLDivElement>(null);
-  const syncing = useRef(false);
+  const leftRef = useRef<HTMLDivElement>(null)
+  const rightRef = useRef<HTMLDivElement>(null)
+  const syncing = useRef(false)
 
   const activeNonOutdatedThreads = useMemo(
-    () => threads.filter(t => !t.outdated && t.comments.length > 0),
-    [threads],
-  );
+    () => threads.filter((t) => !t.outdated && t.comments.length > 0),
+    [threads]
+  )
 
-  const { isCopied, copy } = useCopyToClipboard();
+  const { isCopied, copy } = useCopyToClipboard()
 
   const handleCopyComments = useCallback(() => {
-    if (activeNonOutdatedThreads.length === 0) return;
-    const parts: string[] = [];
+    if (activeNonOutdatedThreads.length === 0) return
+    const parts: string[] = []
     for (const t of activeNonOutdatedThreads) {
       for (const c of t.comments) {
-        parts.push(`${t.file}#${t.line}\n${c.body}`);
+        parts.push(`${t.file}#${t.line}\n${c.body}`)
       }
     }
-    const comments = parts.join('\n-----\n');
+    const comments = parts.join('\n-----\n')
     const prompt = [
       'You are a code reviewer. The user has left review comments on a diff.',
       'Address each comment by suggesting concrete code changes or explanations.',
       '',
       `Total comments: ${totalCommentCount}`,
       '',
-      comments,
-    ].join('\n');
-    copy(prompt);
-  }, [activeNonOutdatedThreads, totalCommentCount, copy]);
+      comments
+    ].join('\n')
+    copy(prompt)
+  }, [activeNonOutdatedThreads, totalCommentCount, copy])
 
   const handleScroll = useCallback((source: DiffSide) => {
-    if (syncing.current) return;
-    syncing.current = true;
-    const from = source === 'left' ? leftRef.current : rightRef.current;
-    const to = source === 'left' ? rightRef.current : leftRef.current;
+    if (syncing.current) return
+    syncing.current = true
+    const from = source === 'left' ? leftRef.current : rightRef.current
+    const to = source === 'left' ? rightRef.current : leftRef.current
     if (from && to) {
-      to.scrollTop = from.scrollTop;
-      to.scrollLeft = from.scrollLeft;
+      to.scrollTop = from.scrollTop
+      to.scrollLeft = from.scrollLeft
     }
-    syncing.current = false;
-  }, []);
+    syncing.current = false
+  }, [])
 
   return (
     <main className="flex-1 flex flex-col min-w-0">
       <div className="shrink-0 flex items-center justify-between px-5 py-3 border-b border-border bg-surface-alt">
         <div className="flex items-center gap-3 min-w-0">
-          <span className="text-[13px] font-mono font-medium text-text truncate">
-            {fileName}
-          </span>
+          <span className="text-[13px] font-mono font-medium text-text truncate">{fileName}</span>
           {status && <StatusBadge status={status} />}
         </div>
         <div className="flex items-center gap-2 text-[12px] font-mono">
@@ -136,7 +128,7 @@ const DiffPanel = memo(function DiffPanel({
         />
       </div>
     </main>
-  );
-});
+  )
+})
 
-export default DiffPanel;
+export default DiffPanel

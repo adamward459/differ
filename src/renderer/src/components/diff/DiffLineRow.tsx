@@ -1,41 +1,41 @@
-import { memo } from "react";
-import { RiAddLine, RiChat3Line } from "@remixicon/react";
-import IconButton from "../common/IconButton";
-import type { DiffLine, DiffSide, LineType } from "../../types";
+import { memo } from 'react'
+import { RiAddLine, RiChat3Line } from '@remixicon/react'
+import IconButton from '../common/IconButton'
+import type { DiffLine, DiffSide, LineType } from '../../types'
 
 const lineColor: Record<LineType, string> = {
-  added: "bg-diff-add-bg text-diff-add",
-  removed: "bg-diff-rm-bg text-diff-rm",
-  unchanged: "text-text-secondary",
-  placeholder: "bg-surface-alt",
-};
+  added: 'bg-diff-add-bg text-diff-add',
+  removed: 'bg-diff-rm-bg text-diff-rm',
+  unchanged: 'text-text-secondary',
+  placeholder: 'bg-surface-alt'
+}
 
 const gutterColor: Record<LineType, string> = {
-  added: "text-diff-add-gutter",
-  removed: "text-diff-rm-gutter",
-  unchanged: "text-text-muted",
-  placeholder: "text-transparent",
-};
+  added: 'text-diff-add-gutter',
+  removed: 'text-diff-rm-gutter',
+  unchanged: 'text-text-muted',
+  placeholder: 'text-transparent'
+}
 
 const prefixChar: Record<LineType, string> = {
-  added: "+",
-  removed: "−",
-  unchanged: " ",
-  placeholder: " ",
-};
+  added: '+',
+  removed: '−',
+  unchanged: ' ',
+  placeholder: ' '
+}
 
 function ActionButtons({
   lineNum,
   hasThread,
   isOpen,
   onToggle,
-  onOpen,
+  onOpen
 }: {
-  lineNum: number;
-  hasThread: boolean;
-  isOpen: boolean;
-  onToggle: (lineNum: number) => void;
-  onOpen: (lineNum: number) => void;
+  lineNum: number
+  hasThread: boolean
+  isOpen: boolean
+  onToggle: (lineNum: number) => void
+  onOpen: (lineNum: number) => void
 }) {
   return (
     <span className="shrink-0 flex items-center px-1 gap-0.5">
@@ -60,7 +60,7 @@ function ActionButtons({
         title={`Add comment on line ${lineNum}`}
       />
     </span>
-  );
+  )
 }
 
 const DiffLineRow = memo(function DiffLineRow({
@@ -69,32 +69,32 @@ const DiffLineRow = memo(function DiffLineRow({
   hasThread,
   isOpen,
   onToggle,
-  onOpen,
+  onOpen
 }: {
-  line: DiffLine;
-  side: DiffSide;
-  hasThread: boolean;
-  isOpen: boolean;
-  onToggle: (lineNum: number) => void;
-  onOpen: (lineNum: number) => void;
+  line: DiffLine
+  side: DiffSide
+  hasThread: boolean
+  isOpen: boolean
+  onToggle: (lineNum: number) => void
+  onOpen: (lineNum: number) => void
 }) {
-  if (line.type === "placeholder") {
+  if (line.type === 'placeholder') {
     return (
       <div className={`flex ${lineColor.placeholder}`}>
-        {side === "right" && <span className="shrink-0 w-6">&nbsp;</span>}
+        {side === 'right' && <span className="shrink-0 w-6">&nbsp;</span>}
         <span className="shrink-0 w-12">&nbsp;</span>
         <span className="shrink-0 w-5">&nbsp;</span>
         <span className="flex-1">&nbsp;</span>
-        {side === "left" && <span className="shrink-0 w-6">&nbsp;</span>}
+        {side === 'left' && <span className="shrink-0 w-6">&nbsp;</span>}
       </div>
-    );
+    )
   }
 
   return (
     <div
       className={`group/line flex ${lineColor[line.type]} relative transition-colors duration-75`}
     >
-      {side === "right" && (
+      {side === 'right' && (
         <ActionButtons
           lineNum={line.num}
           hasThread={hasThread}
@@ -110,19 +110,17 @@ const DiffLineRow = memo(function DiffLineRow({
       </span>
       <span
         className={`shrink-0 w-5 select-none text-center font-medium ${
-          line.type === "added"
-            ? "text-diff-add"
-            : line.type === "removed"
-              ? "text-diff-rm"
-              : "text-transparent"
+          line.type === 'added'
+            ? 'text-diff-add'
+            : line.type === 'removed'
+              ? 'text-diff-rm'
+              : 'text-transparent'
         }`}
       >
         {prefixChar[line.type]}
       </span>
-      <span className="whitespace-pre-wrap break-all pr-4 flex-1">
-        {line.content || " "}
-      </span>
-      {side === "left" && (
+      <span className="whitespace-pre-wrap break-all pr-4 flex-1">{line.content || ' '}</span>
+      {side === 'left' && (
         <ActionButtons
           lineNum={line.num}
           hasThread={hasThread}
@@ -132,7 +130,7 @@ const DiffLineRow = memo(function DiffLineRow({
         />
       )}
     </div>
-  );
-});
+  )
+})
 
-export default DiffLineRow;
+export default DiffLineRow

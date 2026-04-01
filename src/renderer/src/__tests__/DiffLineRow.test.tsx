@@ -1,19 +1,19 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import DiffLineRow from "../components/diff/DiffLineRow";
-import type { DiffLine } from "../types";
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
+import DiffLineRow from '../components/diff/DiffLineRow'
+import type { DiffLine } from '../types'
 
-describe("DiffLineRow", () => {
-  const onToggle = vi.fn();
-  const onOpen = vi.fn();
+describe('DiffLineRow', () => {
+  const onToggle = vi.fn()
+  const onOpen = vi.fn()
 
   afterEach(() => {
-    onToggle.mockClear();
-    onOpen.mockClear();
-  });
+    onToggle.mockClear()
+    onOpen.mockClear()
+  })
 
-  it("renders placeholder as empty row", () => {
-    const line: DiffLine = { num: 0, content: "", type: "placeholder" };
+  it('renders placeholder as empty row', () => {
+    const line: DiffLine = { num: 0, content: '', type: 'placeholder' }
     const { container } = render(
       <DiffLineRow
         line={line}
@@ -22,14 +22,14 @@ describe("DiffLineRow", () => {
         isOpen={false}
         onToggle={onToggle}
         onOpen={onOpen}
-      />,
-    );
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
-    expect(container.textContent?.trim()).toBe("");
-  });
+      />
+    )
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    expect(container.textContent?.trim()).toBe('')
+  })
 
-  it("renders added line with line number and + prefix", () => {
-    const line: DiffLine = { num: 5, content: "new code", type: "added" };
+  it('renders added line with line number and + prefix', () => {
+    const line: DiffLine = { num: 5, content: 'new code', type: 'added' }
     const { container } = render(
       <DiffLineRow
         line={line}
@@ -38,15 +38,15 @@ describe("DiffLineRow", () => {
         isOpen={false}
         onToggle={onToggle}
         onOpen={onOpen}
-      />,
-    );
-    expect(screen.getByText("5")).toBeInTheDocument();
-    expect(screen.getByText("new code")).toBeInTheDocument();
-    expect(container.textContent).toContain("+");
-  });
+      />
+    )
+    expect(screen.getByText('5')).toBeInTheDocument()
+    expect(screen.getByText('new code')).toBeInTheDocument()
+    expect(container.textContent).toContain('+')
+  })
 
-  it("renders removed line with − prefix", () => {
-    const line: DiffLine = { num: 3, content: "old code", type: "removed" };
+  it('renders removed line with − prefix', () => {
+    const line: DiffLine = { num: 3, content: 'old code', type: 'removed' }
     const { container } = render(
       <DiffLineRow
         line={line}
@@ -55,14 +55,14 @@ describe("DiffLineRow", () => {
         isOpen={false}
         onToggle={onToggle}
         onOpen={onOpen}
-      />,
-    );
-    expect(screen.getByText("old code")).toBeInTheDocument();
-    expect(container.textContent).toContain("−");
-  });
+      />
+    )
+    expect(screen.getByText('old code')).toBeInTheDocument()
+    expect(container.textContent).toContain('−')
+  })
 
-  it("shows thread indicator when hasThread is true and not open", () => {
-    const line: DiffLine = { num: 1, content: "code", type: "unchanged" };
+  it('shows thread indicator when hasThread is true and not open', () => {
+    const line: DiffLine = { num: 1, content: 'code', type: 'unchanged' }
     render(
       <DiffLineRow
         line={line}
@@ -71,13 +71,13 @@ describe("DiffLineRow", () => {
         isOpen={false}
         onToggle={onToggle}
         onOpen={onOpen}
-      />,
-    );
-    expect(screen.getByTitle("View comments on line 1")).toBeInTheDocument();
-  });
+      />
+    )
+    expect(screen.getByTitle('View comments on line 1')).toBeInTheDocument()
+  })
 
-  it("hides thread indicator when isOpen is true", () => {
-    const line: DiffLine = { num: 1, content: "code", type: "unchanged" };
+  it('hides thread indicator when isOpen is true', () => {
+    const line: DiffLine = { num: 1, content: 'code', type: 'unchanged' }
     render(
       <DiffLineRow
         line={line}
@@ -86,15 +86,13 @@ describe("DiffLineRow", () => {
         isOpen={true}
         onToggle={onToggle}
         onOpen={onOpen}
-      />,
-    );
-    expect(
-      screen.queryByTitle("View comments on line 1"),
-    ).not.toBeInTheDocument();
-  });
+      />
+    )
+    expect(screen.queryByTitle('View comments on line 1')).not.toBeInTheDocument()
+  })
 
-  it("calls onOpen when add comment button is clicked", () => {
-    const line: DiffLine = { num: 7, content: "code", type: "unchanged" };
+  it('calls onOpen when add comment button is clicked', () => {
+    const line: DiffLine = { num: 7, content: 'code', type: 'unchanged' }
     render(
       <DiffLineRow
         line={line}
@@ -103,10 +101,10 @@ describe("DiffLineRow", () => {
         isOpen={false}
         onToggle={onToggle}
         onOpen={onOpen}
-      />,
-    );
-    fireEvent.click(screen.getByTitle("Add comment on line 7"));
-    expect(onOpen).toHaveBeenCalledWith(7);
-    expect(onToggle).not.toHaveBeenCalled();
-  });
-});
+      />
+    )
+    fireEvent.click(screen.getByTitle('Add comment on line 7'))
+    expect(onOpen).toHaveBeenCalledWith(7)
+    expect(onToggle).not.toHaveBeenCalled()
+  })
+})

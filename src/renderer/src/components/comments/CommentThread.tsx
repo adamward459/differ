@@ -1,57 +1,57 @@
-import { memo, useState, useCallback, useRef, useEffect } from "react";
+import { memo, useState, useCallback, useRef, useEffect } from 'react'
 import {
   RiSendPlaneFill,
   RiCloseLine,
   RiHistoryLine,
   RiDeleteBinLine,
   RiArrowDownSLine,
-  RiArrowRightSLine,
-} from "@remixicon/react";
-import IconButton from "../common/IconButton";
-import type { Comment } from "../../types";
+  RiArrowRightSLine
+} from '@remixicon/react'
+import IconButton from '../common/IconButton'
+import type { Comment } from '../../types'
 
 const CommentThread = memo(function CommentThread({
   comments,
   outdated,
   onAdd,
   onDelete,
-  onClose,
+  onClose
 }: {
-  comments: Comment[];
-  outdated: boolean;
-  onAdd: (body: string) => void;
-  onDelete: (commentId: string) => void;
-  onClose: () => void;
+  comments: Comment[]
+  outdated: boolean
+  onAdd: (body: string) => void
+  onDelete: (commentId: string) => void
+  onClose: () => void
 }) {
-  const [value, setValue] = useState("");
-  const [collapsed, setCollapsed] = useState(outdated);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [value, setValue] = useState('')
+  const [collapsed, setCollapsed] = useState(outdated)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    if (!collapsed) inputRef.current?.focus();
-  }, [collapsed]);
+    if (!collapsed) inputRef.current?.focus()
+  }, [collapsed])
 
   const handleSubmit = useCallback(() => {
-    const trimmed = value.trim();
-    if (!trimmed) return;
-    onAdd(trimmed);
-    setValue("");
-  }, [value, onAdd]);
+    const trimmed = value.trim()
+    if (!trimmed) return
+    onAdd(trimmed)
+    setValue('')
+  }, [value, onAdd])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        handleSubmit();
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        handleSubmit()
       }
-      if (e.key === "Escape") {
-        onClose();
+      if (e.key === 'Escape') {
+        onClose()
       }
     },
-    [handleSubmit, onClose],
-  );
+    [handleSubmit, onClose]
+  )
 
-  const hasComments = comments.length > 0;
+  const hasComments = comments.length > 0
 
   return (
     <div className="border border-comment-border rounded-xl bg-comment-bg mx-3 my-1.5 shadow-sm overflow-hidden">
@@ -59,7 +59,7 @@ const CommentThread = memo(function CommentThread({
         <div className="flex items-center gap-1 px-2.5 py-1.5 border-b border-comment-border">
           <button
             type="button"
-            onClick={() => setCollapsed(prev => !prev)}
+            onClick={() => setCollapsed((prev) => !prev)}
             className="flex items-center gap-1 text-[11px] font-medium text-text-muted hover:text-text-secondary transition-colors duration-150"
             aria-expanded={!collapsed}
             aria-label="Toggle thread"
@@ -70,7 +70,7 @@ const CommentThread = memo(function CommentThread({
               <RiArrowDownSLine className="w-3.5 h-3.5" />
             )}
             <span>
-              {comments.length} {comments.length === 1 ? "comment" : "comments"}
+              {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
             </span>
           </button>
           <span className="flex-1" />
@@ -88,16 +88,14 @@ const CommentThread = memo(function CommentThread({
       {outdated && (
         <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-badge-bg text-badge-text text-[11px] font-medium border-b border-comment-border">
           <RiHistoryLine className="w-3.5 h-3.5 shrink-0" />
-          <span>
-            Outdated — this code has changed since these comments were added
-          </span>
+          <span>Outdated — this code has changed since these comments were added</span>
         </div>
       )}
       {(!hasComments || !collapsed) && (
         <>
           {hasComments && (
             <div className="divide-y divide-comment-border">
-              {comments.map(c => (
+              {comments.map((c) => (
                 <div
                   key={c.id}
                   className="group/comment flex items-start gap-1 px-3.5 py-2.5 text-[12px] leading-relaxed text-text-secondary"
@@ -120,7 +118,7 @@ const CommentThread = memo(function CommentThread({
             <textarea
               ref={inputRef}
               value={value}
-              onChange={e => setValue(e.target.value)}
+              onChange={(e) => setValue(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Add a comment… (⌘↵ to send)"
               rows={2}
@@ -150,7 +148,7 @@ const CommentThread = memo(function CommentThread({
         </>
       )}
     </div>
-  );
-});
+  )
+})
 
-export default CommentThread;
+export default CommentThread

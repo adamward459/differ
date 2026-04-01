@@ -1,27 +1,15 @@
-import { memo } from "react";
-import { RiFolderOpenLine } from "@remixicon/react";
-import logoSrc from "../../assets/Logo.png";
+import { memo } from 'react'
+import { RiFolderOpenLine } from '@remixicon/react'
+import logoSrc from '../../assets/Logo.png'
 
-const LandingView = memo(function LandingView({
-  onOpenFolder,
-}: {
-  onOpenFolder: () => void;
-}) {
+const LandingView = memo(function LandingView({ onOpenFolder }: { onOpenFolder: () => void }) {
   return (
     <div className="flex h-screen items-center justify-center bg-surface text-text">
       <div className="flex flex-col items-center gap-5">
-        <img
-          src={logoSrc}
-          alt="Differ logo"
-          className="w-20 h-20 rounded-2xl"
-        />
+        <img src={logoSrc} alt="Differ logo" className="w-20 h-20 rounded-2xl" />
         <div className="text-center">
-          <p className="text-[15px] font-semibold text-text mb-1">
-            Open a repository
-          </p>
-          <p className="text-[13px] text-text-muted">
-            Select a folder to view its changes
-          </p>
+          <p className="text-[15px] font-semibold text-text mb-1">Open a repository</p>
+          <p className="text-[13px] text-text-muted">Select a folder to view its changes</p>
         </div>
         <button
           onClick={onOpenFolder}
@@ -31,7 +19,7 @@ const LandingView = memo(function LandingView({
         </button>
       </div>
     </div>
-  );
-});
+  )
+})
 
-export default LandingView;
+export default LandingView

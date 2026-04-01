@@ -1,15 +1,15 @@
-import { memo } from 'react';
-import { RiFileCodeLine, RiChat3Line } from '@remixicon/react';
-import StatusBadge from '../common/StatusBadge';
-import type { FileEntry } from '../../types';
+import { memo } from 'react'
+import { RiFileCodeLine, RiChat3Line } from '@remixicon/react'
+import StatusBadge from '../common/StatusBadge'
+import type { FileEntry } from '../../types'
 
 export interface FileItemProps extends Pick<
   FileEntry,
   'name' | 'additions' | 'deletions' | 'status'
 > {
-  active: boolean;
-  commentCount?: number;
-  onClick?: () => void;
+  active: boolean
+  commentCount?: number
+  onClick?: () => void
 }
 
 const FileItem = memo(function FileItem({
@@ -19,7 +19,7 @@ const FileItem = memo(function FileItem({
   status,
   active,
   commentCount,
-  onClick,
+  onClick
 }: FileItemProps) {
   return (
     <button
@@ -37,9 +37,7 @@ const FileItem = memo(function FileItem({
       <div className="flex items-center gap-2.5 min-w-0">
         <RiFileCodeLine
           className={`shrink-0 w-4 h-4 transition-colors duration-150 ${
-            active
-              ? 'text-accent'
-              : 'text-text-muted group-hover:text-text-secondary'
+            active ? 'text-accent' : 'text-text-muted group-hover:text-text-secondary'
           }`}
         />
         <span className="truncate text-[13px] font-mono flex-1">{name}</span>
@@ -58,7 +56,7 @@ const FileItem = memo(function FileItem({
         </div>
       )}
     </button>
-  );
-});
+  )
+})
 
-export default FileItem;
+export default FileItem

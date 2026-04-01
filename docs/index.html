@@ -47,8 +47,7 @@
 
       body {
         font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-          Arial, sans-serif;
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         background: var(--bg);
         color: var(--text);
         line-height: 1.6;
@@ -137,7 +136,7 @@
 
       code,
       kbd {
-        font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+        font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
         font-size: 0.85em;
         background: var(--code-bg);
         padding: 0.15em 0.4em;
@@ -218,27 +217,21 @@
         <img src="logo.png" alt="Differ logo" width="96" height="96" />
         <h1>Differ</h1>
         <p class="tagline">
-          A lightweight, native-feeling Git diff viewer built with Electron,
-          React 19, and Tailwind CSS 4.
+          A lightweight, native-feeling Git diff viewer built with Electron, React 19, and Tailwind
+          CSS 4.
         </p>
         <p class="tagline-sub">
-          Open any local repository, browse changed files, and review diffs
-          side-by-side — with inline commenting.
+          Open any local repository, browse changed files, and review diffs side-by-side — with
+          inline commenting.
         </p>
         <div class="badges">
           <img
             src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-blue"
             alt="Platforms"
           />
-          <img
-            src="https://img.shields.io/badge/electron-33-47848f"
-            alt="Electron"
-          />
+          <img src="https://img.shields.io/badge/electron-33-47848f" alt="Electron" />
           <img src="https://img.shields.io/badge/react-19-61dafb" alt="React" />
-          <img
-            src="https://img.shields.io/badge/license-MIT-green"
-            alt="License"
-          />
+          <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
         </div>
       </div>
     </header>
@@ -249,23 +242,18 @@
         <div class="grid">
           <div class="card">
             <h3>Side-by-side diff</h3>
-            <p>
-              Aligned left/right columns with synchronized scrolling, just like
-              GitHub.
-            </p>
+            <p>Aligned left/right columns with synchronized scrolling, just like GitHub.</p>
           </div>
           <div class="card">
             <h3>Live file watching</h3>
             <p>
-              Diffs refresh automatically when you save files, switch branches,
-              commit, or stash.
+              Diffs refresh automatically when you save files, switch branches, commit, or stash.
             </p>
           </div>
           <div class="card">
             <h3>Inline comments</h3>
             <p>
-              Click any line to add review comments. Threads are marked outdated
-              when code changes.
+              Click any line to add review comments. Threads are marked outdated when code changes.
             </p>
           </div>
           <div class="card">
@@ -274,17 +262,11 @@
           </div>
           <div class="card">
             <h3>OS-adaptive theme</h3>
-            <p>
-              Light and dark modes via <code>prefers-color-scheme</code>, using
-              OKLCH colors.
-            </p>
+            <p>Light and dark modes via <code>prefers-color-scheme</code>, using OKLCH colors.</p>
           </div>
           <div class="card">
             <h3>Keyboard navigation</h3>
-            <p>
-              Arrow keys, <kbd>⌘/Ctrl+Enter</kbd> to submit,
-              <kbd>Escape</kbd> to close.
-            </p>
+            <p>Arrow keys, <kbd>⌘/Ctrl+Enter</kbd> to submit, <kbd>Escape</kbd> to close.</p>
           </div>
         </div>
       </section>
@@ -344,32 +326,32 @@ npx electron-builder --mac   # or --win</code></pre>
       <section>
         <h2>Architecture</h2>
         <p>
-          Differ uses Electron's main/renderer split with a secure preload
-          bridge. The renderer is a React 19 SPA compiled with the React
-          Compiler babel plugin. Git operations run in the main process via
-          <code>simple-git</code>, and file system changes are watched and
-          debounced before notifying the renderer over IPC.
+          Differ uses Electron's main/renderer split with a secure preload bridge. The renderer is a
+          React 19 SPA compiled with the React Compiler babel plugin. Git operations run in the main
+          process via
+          <code>simple-git</code>, and file system changes are watched and debounced before
+          notifying the renderer over IPC.
         </p>
         <div class="grid" style="margin-top: 1.5rem">
           <div class="card">
             <h3>IPC channels</h3>
             <p>
-              Minimal, focused channels: folder picker, file list, diff
-              fetching, repo watching, and login-item settings.
+              Minimal, focused channels: folder picker, file list, diff fetching, repo watching, and
+              login-item settings.
             </p>
           </div>
           <div class="card">
             <h3>Diff parsing</h3>
             <p>
-              Unified diff output is converted into aligned left/right line
-              arrays for row-aligned side-by-side rendering.
+              Unified diff output is converted into aligned left/right line arrays for row-aligned
+              side-by-side rendering.
             </p>
           </div>
           <div class="card">
             <h3>Comment threads</h3>
             <p>
-              In-memory per session. Threads snapshot line content at creation
-              and are flagged outdated when code changes.
+              In-memory per session. Threads snapshot line content at creation and are flagged
+              outdated when code changes.
             </p>
           </div>
         </div>
@@ -378,9 +360,7 @@ npx electron-builder --mac   # or --win</code></pre>
 
     <footer>
       <div class="container">
-        <p>
-          MIT License &middot; <a href="https://github.com">View on GitHub</a>
-        </p>
+        <p>MIT License &middot; <a href="https://github.com">View on GitHub</a></p>
       </div>
     </footer>
   </body>

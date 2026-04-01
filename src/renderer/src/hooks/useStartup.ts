@@ -1,20 +1,20 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react'
 
 export function useStartup(): {
-  openAtLogin: boolean;
-  toggleOpenAtLogin: () => void;
+  openAtLogin: boolean
+  toggleOpenAtLogin: () => void
 } {
-  const [openAtLogin, setOpenAtLogin] = useState(false);
+  const [openAtLogin, setOpenAtLogin] = useState(false)
 
   useEffect(() => {
-    window.api.getOpenAtLogin().then(setOpenAtLogin);
-  }, []);
+    window.api.getOpenAtLogin().then(setOpenAtLogin)
+  }, [])
 
   const toggleOpenAtLogin = useCallback(() => {
-    const next = !openAtLogin;
-    setOpenAtLogin(next);
-    window.api.setOpenAtLogin(next);
-  }, [openAtLogin]);
+    const next = !openAtLogin
+    setOpenAtLogin(next)
+    window.api.setOpenAtLogin(next)
+  }, [openAtLogin])
 
-  return { openAtLogin, toggleOpenAtLogin };
+  return { openAtLogin, toggleOpenAtLogin }
 }

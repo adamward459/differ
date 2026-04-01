@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo } from "react";
-import type { DiffLine, DiffSide, CommentThread, ThreadMap } from "../types";
+import { useState, useCallback, useMemo } from 'react';
+import type { DiffLine, DiffSide, CommentThread, ThreadMap } from '../types';
 
 /** Check each thread against current diff lines; mark outdated if content changed. */
 function markOutdatedThreads(
@@ -11,7 +11,7 @@ function markOutdatedThreads(
   let changed = false;
   const updated = threads.map(t => {
     if (t.file !== file || t.lineContent === undefined) return t;
-    const lines = t.side === "left" ? left : right;
+    const lines = t.side === 'left' ? left : right;
     const current = lines.find(l => l.num === t.line);
     const isOutdated = !current || current.content !== t.lineContent;
     if (isOutdated !== !!t.outdated) {
@@ -47,8 +47,8 @@ export function useThreads(
   const handleAddComment = useCallback(
     (side: DiffSide, line: number, body: string) => {
       if (!activeFile) return;
-      const lines = side === "left" ? leftLines : rightLines;
-      const lineContent = lines.find(l => l.num === line)?.content ?? "";
+      const lines = side === 'left' ? leftLines : rightLines;
+      const lineContent = lines.find(l => l.num === line)?.content ?? '';
       setThreads(prev => {
         const idx = prev.findIndex(
           t => t.file === activeFile && t.side === side && t.line === line,
@@ -59,12 +59,11 @@ export function useThreads(
           createdAt: Date.now(),
         };
         if (idx >= 0) {
+          const existing = prev[idx];
           const updated = [...prev];
           updated[idx] = {
-            ...updated[idx],
-            comments: [...updated[idx].comments, comment],
-            outdated: false,
-            lineContent,
+            ...existing,
+            comments: [...existing.comments, comment],
           };
           return updated;
         }
@@ -112,12 +111,12 @@ export function useThreads(
   );
 
   const leftThreads = useMemo(
-    () => buildThreadMap(threads, activeFile, "left"),
+    () => buildThreadMap(threads, activeFile, 'left'),
     [threads, activeFile],
   );
 
   const rightThreads = useMemo(
-    () => buildThreadMap(threads, activeFile, "right"),
+    () => buildThreadMap(threads, activeFile, 'right'),
     [threads, activeFile],
   );
 

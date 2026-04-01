@@ -1,13 +1,13 @@
-import { useState, useCallback, useRef, useEffect } from "react";
-import type { FileEntry, DiffLine } from "../types";
-import { parseDiff } from "../utils/parseDiff";
+import { useState, useCallback, useRef, useEffect } from 'react';
+import type { FileEntry, DiffLine } from '../types';
+import { parseDiff } from '../utils/parseDiff';
 
 function mapFiles(files: { name: string; status: string }[]): FileEntry[] {
   return files.map(f => ({
     name: f.name,
     additions: 0,
     deletions: 0,
-    status: f.status as FileEntry["status"],
+    status: f.status as FileEntry['status'],
   }));
 }
 
@@ -44,6 +44,9 @@ export function useRepo(
     },
     [onDiffUpdated],
   );
+
+  const applyDiffRef = useRef(applyDiff);
+  applyDiffRef.current = applyDiff;
 
   const handleOpenFolder = useCallback(async () => {
     const selected = await window.api.openFolder();
@@ -95,7 +98,7 @@ export function useRepo(
       if (af) {
         if (entries.some(e => e.name === af)) {
           const diffResult = await window.api.getFileDiff(fp, af);
-          applyDiff(diffResult, af);
+          applyDiffRef.current(diffResult, af);
         } else {
           setActiveFile(null);
           setLeftLines([]);
@@ -106,9 +109,15 @@ export function useRepo(
 
     return () => {
       unsubscribe();
+    };
+  }, []);
+
+  // Clean up FS watcher on unmount only
+  useEffect(() => {
+    return () => {
       window.api.unwatchRepo();
     };
-  }, [applyDiff]);
+  }, []);
 
   return {
     folderPath,

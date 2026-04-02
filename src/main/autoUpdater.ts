@@ -17,8 +17,9 @@ function broadcast(channel: string, data: UpdateStatus): void {
 }
 
 export function initAutoUpdater(): void {
+  // Download updates in background, but never auto-install or auto-restart
   autoUpdater.autoDownload = true
-  autoUpdater.autoInstallOnAppQuit = true
+  autoUpdater.autoInstallOnAppQuit = false
 
   autoUpdater.on('checking-for-update', () => {
     broadcast('update-status', { status: 'checking' })
@@ -59,8 +60,8 @@ export function checkForUpdatesManually(): void {
 }
 
 export function quitAndInstall(): void {
-  // Force the app to quit even on macOS where closing all windows
-  // normally keeps the process alive. Without isSilent=false and
-  // isForceRunAfter=true, the update may not apply on relaunch.
+  // Quit and install when user explicitly clicks "Restart now"
+  // isSilent=false shows dialogs if needed
+  // isForceRunAfter=true ensures app restarts after install
   autoUpdater.quitAndInstall(false, true)
 }

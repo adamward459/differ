@@ -59,5 +59,8 @@ export function checkForUpdatesManually(): void {
 }
 
 export function quitAndInstall(): void {
-  autoUpdater.quitAndInstall()
+  // Force the app to quit even on macOS where closing all windows
+  // normally keeps the process alive. Without isSilent=false and
+  // isForceRunAfter=true, the update may not apply on relaunch.
+  autoUpdater.quitAndInstall(false, true)
 }

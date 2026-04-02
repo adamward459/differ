@@ -279,3 +279,7 @@ app.on('window-all-closed', () => {
   stopWatching()
   if (process.platform !== 'darwin') app.quit()
 })
+
+app.on('before-quit', () => {
+  stopWatching()
+})

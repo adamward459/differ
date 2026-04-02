@@ -20,7 +20,14 @@ export function useAutoUpdate(): UseAutoUpdateReturn {
 
   useEffect(() => {
     const cleanup = window.api.onUpdateStatus((data) => {
-      setUpdateStatus(data as UpdateStatus)
+      setUpdateStatus((prev) => {
+        // Once the update is downloaded, don't let periodic re-checks
+        // (checking / not-available) overwrite the "downloaded" state.
+        if (prev.status === 'downloaded' && (data as UpdateStatus).status !== 'error') {
+          return prev
+        }
+        return data as UpdateStatus
+      })
     })
     return cleanup
   }, [])

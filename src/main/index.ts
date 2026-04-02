@@ -220,6 +220,12 @@ function buildMenu(): void {
             if (win) win.webContents.send('menu-open-folder')
           }
         },
+        {
+          label: 'Check for Updates',
+          click: (): void => {
+            checkForUpdatesManually()
+          }
+        },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' }
       ]

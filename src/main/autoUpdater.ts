@@ -18,7 +18,7 @@ function broadcast(channel: string, data: UpdateStatus): void {
 
 export function initAutoUpdater(): void {
   // Download updates in background and keep the default install-on-quit flow.
-  // This lets the app relaunch cleanly when the user chooses Restart now.
+  // Update checks are now manual from the application menu.
   autoUpdater.autoDownload = true
   autoUpdater.autoInstallOnAppQuit = true
 
@@ -46,14 +46,6 @@ export function initAutoUpdater(): void {
     broadcast('update-status', { status: 'error', message: err.message })
   })
 
-  // Check on launch, then every 30 minutes
-  autoUpdater.checkForUpdates().catch(() => {})
-  setInterval(
-    () => {
-      autoUpdater.checkForUpdates().catch(() => {})
-    },
-    30 * 60 * 1000
-  )
 }
 
 export function checkForUpdatesManually(): void {

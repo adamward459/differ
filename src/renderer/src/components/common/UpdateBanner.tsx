@@ -43,6 +43,7 @@ const UpdateBanner = React.memo(function UpdateBanner({
           <button
             onClick={onInstall}
             className="ml-1 underline hover:text-accent/80 cursor-pointer"
+            type="button"
           >
             Restart now
           </button>
@@ -52,6 +53,7 @@ const UpdateBanner = React.memo(function UpdateBanner({
         onClick={onDismiss}
         className="ml-auto hover:text-accent/80 cursor-pointer"
         aria-label="Dismiss update banner"
+        type="button"
       >
         <RiCloseLine size={14} />
       </button>

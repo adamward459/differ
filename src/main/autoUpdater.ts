@@ -60,8 +60,8 @@ export function checkForUpdatesManually(): void {
 }
 
 export function quitAndInstall(): void {
-  // Quit and install when user explicitly clicks "Restart now"
-  // isSilent=false shows dialogs if needed
-  // isForceRunAfter=true ensures app restarts after install
-  autoUpdater.quitAndInstall(false, true)
+  // Defer quit so the IPC response completes before the app exits.
+  // isSilent=true avoids blocking confirmation dialogs on macOS.
+  // isForceRunAfter=true ensures the app relaunches after installing.
+  setImmediate(() => autoUpdater.quitAndInstall(true, true))
 }

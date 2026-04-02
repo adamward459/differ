@@ -16,8 +16,7 @@ const UpdateBanner = React.memo(function UpdateBanner({
   if (
     status.status === 'idle' ||
     status.status === 'checking' ||
-    status.status === 'not-available' ||
-    status.status === 'error'
+    status.status === 'not-available'
   ) {
     return null
   }
@@ -49,6 +48,13 @@ const UpdateBanner = React.memo(function UpdateBanner({
           </button>
         </>
       )}
+      {status.status === 'installing' && (
+        <>
+          <RiRestartLine size={14} />
+          <span>Restarting to install v{status.version}…</span>
+        </>
+      )}
+      {status.status === 'error' && <span>{status.message}</span>}
       <button
         onClick={onDismiss}
         className="ml-auto hover:text-accent/80 cursor-pointer"

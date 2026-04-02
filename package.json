@@ -1,6 +1,6 @@
 {
   "name": "differ",
-  "version": "1.5.5",
+  "version": "1.5.6",
   "productName": "Differ",
   "description": "Diff viewer with syntax highlighting",
   "main": "./out/main/index.js",

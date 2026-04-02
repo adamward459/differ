@@ -7,6 +7,7 @@ export type UpdateStatus =
   | { status: 'not-available' }
   | { status: 'downloading'; percent: number }
   | { status: 'downloaded'; version: string }
+  | { status: 'installing'; version: string }
   | { status: 'error'; message: string }
 
 interface UseAutoUpdateReturn {
@@ -21,12 +22,17 @@ export function useAutoUpdate(): UseAutoUpdateReturn {
   useEffect(() => {
     const cleanup = window.api.onUpdateStatus((data) => {
       setUpdateStatus((prev) => {
-        // Once the update is downloaded, don't let periodic re-checks
-        // (checking / not-available) overwrite the "downloaded" state.
-        if (prev.status === 'downloaded' && (data as UpdateStatus).status !== 'error') {
+        const next = data as UpdateStatus
+
+        // Keep the ready/installing state visible until install succeeds or fails.
+        if (
+          (prev.status === 'downloaded' || prev.status === 'installing') &&
+          (next.status === 'checking' || next.status === 'not-available')
+        ) {
           return prev
         }
-        return data as UpdateStatus
+
+        return next
       })
     })
     return cleanup

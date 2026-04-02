@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Sidebar from './components/sidebar/Sidebar'
 import DiffPanel from './components/diff/DiffPanel'
 import LandingView from './components/common/LandingView'
@@ -30,6 +30,12 @@ function App(): React.JSX.Element {
 
   const { updateStatus, quitAndInstall } = useAutoUpdate()
   const [bannerDismissed, setBannerDismissed] = useState(false)
+
+  useEffect(() => {
+    if (updateStatus.status !== 'idle' && updateStatus.status !== 'not-available') {
+      setBannerDismissed(false)
+    }
+  }, [updateStatus.status])
 
   if (!repo.folderPath) {
     return <LandingView onOpenFolder={repo.handleOpenFolder} />

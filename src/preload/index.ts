@@ -29,6 +29,13 @@ const api = {
     const handler = (): void => callback()
     ipcRenderer.on('repo-changed', handler)
     return () => ipcRenderer.removeListener('repo-changed', handler)
+  },
+  checkForUpdates: (): Promise<void> => ipcRenderer.invoke('check-for-updates'),
+  quitAndInstall: (): Promise<void> => ipcRenderer.invoke('quit-and-install'),
+  onUpdateStatus: (callback: (data: unknown) => void): (() => void) => {
+    const handler = (_event: unknown, data: unknown): void => callback(data)
+    ipcRenderer.on('update-status', handler)
+    return () => ipcRenderer.removeListener('update-status', handler)
   }
 }
 

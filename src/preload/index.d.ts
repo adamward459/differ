@@ -21,6 +21,9 @@ interface DifferAPI {
   unwatchRepo(): Promise<void>
   openInIde(command: string, folderPath: string, filePath: string, line: number): Promise<void>
   onRepoChanged(callback: () => void): () => void
+  checkForUpdates(): Promise<void>
+  quitAndInstall(): Promise<void>
+  onUpdateStatus(callback: (data: unknown) => void): () => void
 }
 
 declare global {

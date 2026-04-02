@@ -2,8 +2,9 @@ import { app, shell, BrowserWindow, ipcMain, dialog, nativeImage } from 'electro
 import { join } from 'path'
 import { watch, type FSWatcher } from 'fs'
 import { execFile } from 'child_process'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { optimizer, is } from '@electron-toolkit/utils'
 import simpleGit from 'simple-git'
+import { initAutoUpdater, checkForUpdatesManually, quitAndInstall } from './autoUpdater'
 
 function createWindow(): void {
   const icon = nativeImage.createFromPath(join(__dirname, '../../resources/Logo.png'))
@@ -118,6 +119,16 @@ ipcMain.handle(
   }
 )
 
+// ── Auto-updater IPC ──
+
+ipcMain.handle('check-for-updates', () => {
+  checkForUpdatesManually()
+})
+
+ipcMain.handle('quit-and-install', () => {
+  quitAndInstall()
+})
+
 // ── Repo watcher ──
 
 let activeWatchers: FSWatcher[] = []
@@ -184,6 +195,7 @@ app.whenReady().then(() => {
   })
 
   createWindow()
+  initAutoUpdater()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

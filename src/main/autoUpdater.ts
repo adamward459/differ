@@ -17,9 +17,10 @@ function broadcast(channel: string, data: UpdateStatus): void {
 }
 
 export function initAutoUpdater(): void {
-  // Download updates in background, but never auto-install or auto-restart
+  // Download updates in background and keep the default install-on-quit flow.
+  // This lets the app relaunch cleanly when the user chooses Restart now.
   autoUpdater.autoDownload = true
-  autoUpdater.autoInstallOnAppQuit = false
+  autoUpdater.autoInstallOnAppQuit = true
 
   autoUpdater.on('checking-for-update', () => {
     broadcast('update-status', { status: 'checking' })

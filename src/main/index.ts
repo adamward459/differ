@@ -1,6 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, dialog, nativeImage } from 'electron'
 import { join } from 'path'
 import { watch, type FSWatcher } from 'fs'
+import { execFile } from 'child_process'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import simpleGit from 'simple-git'
 
@@ -99,6 +100,23 @@ ipcMain.handle('get-file-diff', async (_event, folderPath: string, filePath: str
     return { error: String(err) }
   }
 })
+
+ipcMain.handle(
+  'open-in-ide',
+  async (_event, command: string, folderPath: string, filePath: string, line: number) => {
+    const fullPath = join(folderPath, filePath)
+    try {
+      if (command === 'idea' || command === 'webstorm') {
+        execFile(command, ['--line', String(line), fullPath], { timeout: 5000 })
+      } else {
+        // VS Code, Cursor, Windsurf, Kiro all support --goto file:line
+        execFile(command, ['--goto', `${fullPath}:${line}`], { timeout: 5000 })
+      }
+    } catch {
+      // non-critical — IDE may not be installed
+    }
+  }
+)
 
 // ── Repo watcher ──
 

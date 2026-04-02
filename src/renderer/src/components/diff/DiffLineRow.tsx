@@ -69,7 +69,8 @@ const DiffLineRow = memo(function DiffLineRow({
   hasThread,
   isOpen,
   onToggle,
-  onOpen
+  onOpen,
+  onOpenInIde
 }: {
   line: DiffLine
   side: DiffSide
@@ -77,6 +78,7 @@ const DiffLineRow = memo(function DiffLineRow({
   isOpen: boolean
   onToggle: (lineNum: number) => void
   onOpen: (lineNum: number) => void
+  onOpenInIde: (lineNum: number) => void
 }) {
   if (line.type === 'placeholder') {
     return (
@@ -104,7 +106,14 @@ const DiffLineRow = memo(function DiffLineRow({
         />
       )}
       <span
-        className={`shrink-0 w-12 text-right pr-3 select-none text-[12px] ${gutterColor[line.type]}`}
+        className={`shrink-0 w-12 text-right pr-3 select-none text-[12px] ${gutterColor[line.type]} cursor-pointer hover:underline`}
+        onClick={() => onOpenInIde(line.num)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') onOpenInIde(line.num)
+        }}
+        title={`Open line ${line.num} in IDE`}
       >
         {line.num}
       </span>

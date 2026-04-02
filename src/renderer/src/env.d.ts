@@ -17,6 +17,7 @@ interface DifferAPI {
   }>
   watchRepo(folderPath: string): Promise<void>
   unwatchRepo(): Promise<void>
+  openInIde(command: string, folderPath: string, filePath: string, line: number): Promise<void>
   onRepoChanged(callback: () => void): () => void
 }
 

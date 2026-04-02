@@ -23,6 +23,8 @@ const api = {
   }> => ipcRenderer.invoke('get-file-diff', folderPath, filePath),
   watchRepo: (folderPath: string): Promise<void> => ipcRenderer.invoke('watch-repo', folderPath),
   unwatchRepo: (): Promise<void> => ipcRenderer.invoke('unwatch-repo'),
+  openInIde: (command: string, folderPath: string, filePath: string, line: number): Promise<void> =>
+    ipcRenderer.invoke('open-in-ide', command, folderPath, filePath, line),
   onRepoChanged: (callback: () => void): (() => void) => {
     const handler = (): void => callback()
     ipcRenderer.on('repo-changed', handler)

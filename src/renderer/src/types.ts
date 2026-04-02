@@ -35,3 +35,18 @@ export interface CommentThread {
 export interface ThreadMap {
   [line: number]: { comments: Comment[]; outdated: boolean }
 }
+
+export interface IDE {
+  id: string
+  label: string
+  command: string
+}
+
+export const IDE_LIST: IDE[] = [
+  { id: 'vscode', label: 'VS Code', command: 'code' },
+  { id: 'cursor', label: 'Cursor', command: 'cursor' },
+  { id: 'windsurf', label: 'Windsurf', command: 'windsurf' },
+  { id: 'kiro', label: 'Kiro', command: 'kiro' },
+  { id: 'idea', label: 'IntelliJ IDEA', command: 'idea' },
+  { id: 'webstorm', label: 'WebStorm', command: 'webstorm' }
+]

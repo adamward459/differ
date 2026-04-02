@@ -58,6 +58,7 @@ function App(): React.JSX.Element {
           onDeleteComment={threadState.handleDeleteComment}
           threads={threadState.threads}
           totalCommentCount={threadState.totalCommentCount}
+          folderPath={repo.folderPath!}
         />
       )}
 

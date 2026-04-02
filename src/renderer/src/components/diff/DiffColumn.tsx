@@ -10,6 +10,7 @@ const DiffColumn = memo(function DiffColumn({
   threads,
   onAddComment,
   onDeleteComment,
+  onOpenInIde,
   scrollRef,
   onScroll
 }: {
@@ -19,6 +20,7 @@ const DiffColumn = memo(function DiffColumn({
   threads: ThreadMap
   onAddComment: (side: DiffSide, line: number, body: string) => void
   onDeleteComment: (side: DiffSide, line: number, commentId: string) => void
+  onOpenInIde: (lineNum: number) => void
   scrollRef: RefObject<HTMLDivElement | null>
   onScroll: (source: DiffSide) => void
 }) {
@@ -70,6 +72,7 @@ const DiffColumn = memo(function DiffColumn({
                 isOpen={isOpen}
                 onToggle={handleToggle}
                 onOpen={handleOpen}
+                onOpenInIde={onOpenInIde}
               />
               {isOpen && line.type !== 'placeholder' && (
                 <CommentThread

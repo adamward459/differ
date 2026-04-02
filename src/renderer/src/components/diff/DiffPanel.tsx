@@ -1,11 +1,12 @@
-import { memo, useRef, useCallback, useMemo } from 'react'
+import { memo, useRef, useCallback, useMemo, useState } from 'react'
 import { RiFileCopyLine, RiCheckLine } from '@remixicon/react'
 import DiffColumn from './DiffColumn'
 import StatusBadge from '../common/StatusBadge'
 import DiffStats from '../common/DiffStats'
 import Button from '../common/Button'
+import IDESelector from '../common/IDESelector'
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard'
-import type { DiffLine, DiffSide, CommentThread, ThreadMap, FileEntry } from '../../types'
+import type { DiffLine, DiffSide, CommentThread, ThreadMap, FileEntry, IDE } from '../../types'
 
 const DiffPanel = memo(function DiffPanel({
   leftLines,
@@ -19,7 +20,8 @@ const DiffPanel = memo(function DiffPanel({
   onAddComment,
   onDeleteComment,
   threads,
-  totalCommentCount
+  totalCommentCount,
+  folderPath
 }: {
   leftLines: DiffLine[]
   rightLines: DiffLine[]
@@ -33,10 +35,20 @@ const DiffPanel = memo(function DiffPanel({
   onDeleteComment: (side: DiffSide, line: number, commentId: string) => void
   threads: CommentThread[]
   totalCommentCount: number
+  folderPath: string
 }) {
   const leftRef = useRef<HTMLDivElement>(null)
   const rightRef = useRef<HTMLDivElement>(null)
   const syncing = useRef(false)
+  const [selectedIde, setSelectedIde] = useState<IDE | null>(null)
+
+  const handleOpenInIde = useCallback(
+    (lineNum: number) => {
+      if (!selectedIde || !folderPath) return
+      window.api.openInIde(selectedIde.command, folderPath, fileName, lineNum)
+    },
+    [selectedIde, folderPath, fileName]
+  )
 
   const activeNonOutdatedThreads = useMemo(
     () => threads.filter((t) => !t.outdated && t.comments.length > 0),
@@ -85,6 +97,7 @@ const DiffPanel = memo(function DiffPanel({
           {status && <StatusBadge status={status} />}
         </div>
         <div className="flex items-center gap-2 text-[12px] font-mono">
+          <IDESelector onSelect={setSelectedIde} />
           {activeNonOutdatedThreads.length > 0 && (
             <Button
               icon={isCopied ? RiCheckLine : RiFileCopyLine}
@@ -111,6 +124,7 @@ const DiffPanel = memo(function DiffPanel({
           threads={leftThreads}
           onAddComment={onAddComment}
           onDeleteComment={onDeleteComment}
+          onOpenInIde={handleOpenInIde}
           scrollRef={leftRef}
           onScroll={handleScroll}
         />
@@ -123,6 +137,7 @@ const DiffPanel = memo(function DiffPanel({
           threads={rightThreads}
           onAddComment={onAddComment}
           onDeleteComment={onDeleteComment}
+          onOpenInIde={handleOpenInIde}
           scrollRef={rightRef}
           onScroll={handleScroll}
         />

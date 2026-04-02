@@ -36,6 +36,11 @@ const api = {
     const handler = (_event: unknown, data: unknown): void => callback(data)
     ipcRenderer.on('update-status', handler)
     return () => ipcRenderer.removeListener('update-status', handler)
+  },
+  onMenuOpenFolder: (callback: () => void): (() => void) => {
+    const handler = (): void => callback()
+    ipcRenderer.on('menu-open-folder', handler)
+    return () => ipcRenderer.removeListener('menu-open-folder', handler)
   }
 }
 

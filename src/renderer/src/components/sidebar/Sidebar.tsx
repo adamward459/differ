@@ -70,7 +70,7 @@ const Sidebar = memo(function Sidebar({
             variant="ghost"
             onClick={onOpenFolder}
             aria-label="Open folder"
-            title="Open folder"
+            title={`Open folder (${navigator.userAgent.includes('Mac') ? '⌘O' : 'Ctrl+O'})`}
           />
         </div>
         <div className="text-[11px] font-medium uppercase tracking-widest text-text-muted">

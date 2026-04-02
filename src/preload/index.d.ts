@@ -24,6 +24,7 @@ interface DifferAPI {
   checkForUpdates(): Promise<void>
   quitAndInstall(): Promise<void>
   onUpdateStatus(callback: (data: unknown) => void): () => void
+  onMenuOpenFolder(callback: () => void): () => void
 }
 
 declare global {

@@ -1,6 +1,8 @@
 import { memo } from 'react'
-import { RiFolderOpenLine } from '@remixicon/react'
 import logoSrc from '../../assets/Logo.png'
+
+const isMac = navigator.userAgent.includes('Mac')
+const shortcutLabel = isMac ? '⌘O' : 'Ctrl+O'
 
 const LandingView = memo(function LandingView({ onOpenFolder }: { onOpenFolder: () => void }) {
   return (
@@ -16,6 +18,7 @@ const LandingView = memo(function LandingView({ onOpenFolder }: { onOpenFolder: 
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-white text-[13px] font-medium hover:opacity-90 transition-opacity shadow-sm"
         >
           Open Folder
+          <kbd className="ml-1 text-[11px] opacity-70">{shortcutLabel}</kbd>
         </button>
       </div>
     </div>

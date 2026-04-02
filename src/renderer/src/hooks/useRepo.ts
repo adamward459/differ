@@ -112,6 +112,17 @@ export function useRepo(
     }
   }, [])
 
+  // Listen for menu "Open Folder" shortcut
+  const handleOpenFolderRef = useRef(handleOpenFolder)
+  handleOpenFolderRef.current = handleOpenFolder
+
+  useEffect(() => {
+    const unsubscribe = window.api.onMenuOpenFolder(() => {
+      handleOpenFolderRef.current()
+    })
+    return unsubscribe
+  }, [])
+
   // Clean up FS watcher on unmount only
   useEffect(() => {
     return () => {
